@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -83,8 +84,8 @@ class EmotionDetectionActivity : AppCompatActivity() {
     }
 
     private fun onImageFileTaken(file: File, imagePath: String) {
-        take_pic_fab.isEnabled = false
-        take_pic_fab.visibility = View.GONE
+        take_pic_fab.enable(false)
+
         val bitmap = face_view.setImage(imagePath)
         val image = FirebaseVisionImage.fromBitmap(bitmap)
 
@@ -92,10 +93,19 @@ class EmotionDetectionActivity : AppCompatActivity() {
                 .getVisionFaceDetector(options)
         detector.detectInImage(image)
                 .addOnSuccessListener {
+                    "eyy".debug()
                     it.map { "smiling prob: ${it.smilingProbability},".debug() }
+                    take_pic_fab.enable(true)
                 }
                 .addOnFailureListener {
+                    take_pic_fab.enable(true)
                     "Err ${it.message}".debug()
                 }
     }
+
+    fun FloatingActionButton.enable(enable: Boolean) {
+        isEnabled = enable
+        visibility = if (enable) View.VISIBLE else View.GONE
+    }
+
 }
