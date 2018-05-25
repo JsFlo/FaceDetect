@@ -54,23 +54,17 @@ class GraphicFaceOverlay(face: FirebaseVisionFace) : BaseFirebaseFaceOverlay(fac
             val centerX = face.boundingBox.exactCenterX()
             val centerY = face.boundingBox.exactCenterY()
 
-            // Draws a circle at the position of the detected face, with the face's track id below.
-            canvas.drawCircle(centerX, centerY,
+            canvas.drawCircle(translateX(centerX), translateY(centerY),
                     FACE_POSITION_RADIUS, facePositionPaint)
 
-//            canvas.drawText("id: ${face.trackingId}", face.boundingBox.left + ID_X_OFFSET, face.boundingBox.top + ID_Y_OFFSET, idPaint)
 //            canvas.drawText("happiness: " + String.format("%.2f", face.getIsSmilingProbability()), x - ID_X_OFFSET, y - ID_Y_OFFSET, mIdPaint)
 //            canvas.drawText("right eye: " + String.format("%.2f", face.getIsRightEyeOpenProbability()), x + ID_X_OFFSET * 2, y + ID_Y_OFFSET * 2, mIdPaint)
 //            canvas.drawText("left eye: " + String.format("%.2f", face.getIsLeftEyeOpenProbability()), x - ID_X_OFFSET * 2, y - ID_Y_OFFSET * 2, mIdPaint)
 
-//            // Draws a bounding box around the face.
-//            val xOffset = scaleX(face.getWidth() / 2.0f)
-//            val yOffset = scaleY(face.getHeight() / 2.0f)
-//            val left = x - xOffset
-//            val top = y - yOffset
-//            val right = x + xOffset
-//            val bottom = y + yOffset
-//            canvas.drawRect(left, top, right, bottom, mBoxPaint)
+            canvas.drawRect(translateX(face.boundingBox.left.toFloat()),
+                    translateY(face.boundingBox.top.toFloat()),
+                    translateX(face.boundingBox.right.toFloat()),
+                    translateY(face.boundingBox.bottom.toFloat()), boxPaint)
         }
     }
 
