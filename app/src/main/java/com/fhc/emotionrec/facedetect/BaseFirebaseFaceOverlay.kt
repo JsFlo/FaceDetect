@@ -3,6 +3,7 @@ package com.fhc.emotionrec.facedetect
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import androidx.core.graphics.withTranslation
 import com.fhc.emotionrec.facedetect.camera.Overlay
 import com.fhc.emotionrec.facedetect.camera.OverlayTransformations
 import com.google.firebase.ml.vision.face.FirebaseVisionFace
