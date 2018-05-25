@@ -1,4 +1,4 @@
-package com.fhc.emotionrec.facedetect
+package com.fhc.emotionrec.facedetect.camera
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -8,10 +8,6 @@ import android.view.SurfaceView
 import com.google.android.gms.vision.CameraSource
 
 data class CameraInfo(val width: Int, val height: Int, val facing: Int)
-interface PreviewCameraSurface {
-    fun start(previewSurfaceListener: PreviewSurfaceListener)
-    fun stop()
-}
 
 interface PreviewSurfaceListener {
     fun onHolderReady(holder: SurfaceHolder)
@@ -22,7 +18,7 @@ class CameraOverlaySurfaceListener(
     private val cameraSource: CameraSource,
     private val overlay: OverlayGroupView?
 ) :
-    PreviewSurfaceListener {
+        PreviewSurfaceListener {
 
     @SuppressLint("MissingPermission")
     override fun onHolderReady(holder: SurfaceHolder) {
@@ -39,6 +35,11 @@ class CameraOverlaySurfaceListener(
         cameraSource.stop()
     }
 
+}
+
+interface PreviewCameraSurface {
+    fun start(previewSurfaceListener: PreviewSurfaceListener)
+    fun stop()
 }
 
 class PreviewSurfaceView(context: Context, attrs: AttributeSet?) :

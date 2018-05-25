@@ -14,7 +14,6 @@ import android.widget.Toast
 import com.emotionrec.emotionrecapp.utils.ImageFileResult
 import com.emotionrec.emotionrecapp.utils.getImageFile
 import com.emotionrec.emotionrecapp.utils.setImage
-import com.fhc.emotionrec.facedetect.facetracker.camera.CameraSourcePreview
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions

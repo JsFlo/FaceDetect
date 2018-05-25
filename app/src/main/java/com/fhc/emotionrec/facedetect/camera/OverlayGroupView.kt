@@ -1,4 +1,4 @@
-package com.fhc.emotionrec.facedetect
+package com.fhc.emotionrec.facedetect.camera
 
 import android.content.Context
 import android.graphics.Canvas
@@ -7,7 +7,7 @@ import android.view.View
 import com.google.android.gms.vision.CameraSource
 
 class OverlayGroupView(context: Context, attrs: AttributeSet?) : View(context, attrs),
-    OverlayTransformations {
+        OverlayTransformations {
 
     private val lock = Object()
     private var previewCameraInfo: CameraInfo? = null
@@ -26,7 +26,10 @@ class OverlayGroupView(context: Context, attrs: AttributeSet?) : View(context, a
     }
 
     fun addOverlay(overlay: Overlay) {
-        sync { overlays.add(overlay) }
+        sync {
+            overlay.onCreate(this)
+            overlays.add(overlay)
+        }
     }
 
     fun removeOverlay(overlay: Overlay) {
@@ -43,7 +46,7 @@ class OverlayGroupView(context: Context, attrs: AttributeSet?) : View(context, a
         sync(false) {
             canvas?.let {
                 updateScaleFactors(previewCameraInfo, canvas)
-                overlays.forEach { it.draw(canvas, this as OverlayTransformations) }
+                overlays.forEach { it.draw(canvas) }
             }
         }
     }
@@ -61,26 +64,27 @@ class OverlayGroupView(context: Context, attrs: AttributeSet?) : View(context, a
 
     override fun scaleY(vertical: Float): Float = vertical * heightScaleFactor
 
-    override fun translateX(x: Float, overlayWidth: Float): Float {
+    override fun translateX(x: Float): Float {
         return if (previewCameraInfo?.facing == CameraSource.CAMERA_FACING_FRONT) {
-            overlayWidth - scaleX(x)
+            width - scaleX(x)
         } else {
             scaleX(x)
         }
     }
 
-    override fun translateY(y: Float, overlayHeight: Float): Float = scaleY(y)
+    override fun translateY(y: Float): Float = scaleY(y)
 
 }
 
 interface OverlayTransformations {
     fun scaleX(horizontal: Float): Float
     fun scaleY(vertical: Float): Float
-    fun translateX(x: Float, overlayWidth: Float): Float
-    fun translateY(y: Float, overlayHeight: Float): Float
+    fun translateX(x: Float): Float
+    fun translateY(y: Float): Float
     fun postInvalidate()
 }
 
 abstract class Overlay {
-    abstract fun draw(canvas: Canvas, overlayTransformations: OverlayTransformations)
+    abstract fun onCreate(overlayTransformations: OverlayTransformations)
+    abstract fun draw(canvas: Canvas)
 }
