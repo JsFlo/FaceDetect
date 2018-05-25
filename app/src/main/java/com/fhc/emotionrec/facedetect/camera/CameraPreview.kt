@@ -16,18 +16,18 @@ interface PreviewSurfaceListener {
 
 class CameraOverlaySurfaceListener(
     private val cameraSource: CameraSource,
-    private val overlay: OverlayGroupView?
+    private val overlayGroupView: OverlayGroupView?
 ) :
         PreviewSurfaceListener {
 
     @SuppressLint("MissingPermission")
     override fun onHolderReady(holder: SurfaceHolder) {
         cameraSource.start(holder)
-        overlay?.let {
+        overlayGroupView?.let {
             val size = cameraSource.previewSize
             val (min, max) = listOf(size.width, size.height).sorted().let { Pair(it[0], it[1]) }
-            overlay.setCameraInfo(CameraInfo(min, max, cameraSource.cameraFacing))
-            overlay.clear()
+            overlayGroupView.setCameraInfo(CameraInfo(min, max, cameraSource.cameraFacing))
+            overlayGroupView.clear()
         }
     }
 
