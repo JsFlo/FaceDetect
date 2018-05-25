@@ -8,11 +8,17 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import kotlinx.android.synthetic.main.view_face_id.view.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
+import java.util.Iterator
+import java.util.function.Predicate
 
-class FaceIdAdapter(private val idList: MutableList<String>) : RecyclerView.Adapter<FaceIdViewHolder>(), EmotionDetectionActivity.GraphicFaceTrackerFactory.FaceTrackerListener {
+data class FaceId(val id: Int, val face: FirebaseVisionFace) {
+
+}
+
+class FaceIdAdapter(private val idFace: MutableList<FaceId> = mutableListOf()) : RecyclerView.Adapter<FaceIdViewHolder>(), EmotionDetectionActivity.GraphicFaceTrackerFactory.FaceTrackerListener {
     override fun newItem(id: Int, face: FirebaseVisionFace) {
         "new Item".debug("faceId")
-        idList.add(id.toString())
+        idFace.add(FaceId(id, face))
         launch(UI) {
             notifyDataSetChanged()
         }
@@ -28,7 +34,8 @@ class FaceIdAdapter(private val idList: MutableList<String>) : RecyclerView.Adap
 
     override fun onDestroyItem(id: Int) {
         "onDestroyItem".debug("faceId")
-        idList.remove(id.toString())
+        idFace.remove(idFace.find { it.id == id })
+
         launch(UI) {
             notifyDataSetChanged()
         }
@@ -36,16 +43,19 @@ class FaceIdAdapter(private val idList: MutableList<String>) : RecyclerView.Adap
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FaceIdViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.view_face_id, parent, false)
+        val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.view_face_id, parent, false)
         return FaceIdViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: FaceIdViewHolder, position: Int) {
-        holder.itemView.face_id_text.text = idList[position]
+        val idFace = idFace[position]
+        holder.itemView.face_id_text.text = idFace.id.toString()
+        holder.itemView.face_id_image.setImageBitmap()
+
     }
 
-    override fun getItemCount() = idList.size
-
+    override fun getItemCount() = idFace.size
 }
 
 class FaceIdViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)

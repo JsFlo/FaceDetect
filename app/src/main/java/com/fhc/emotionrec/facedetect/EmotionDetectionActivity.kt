@@ -59,7 +59,7 @@ class EmotionDetectionActivity : AppCompatActivity() {
         )
 
         face_id_recycler_view.layoutManager = LinearLayoutManager(this)
-        val adapter = FaceIdAdapter(mutableListOf<String>("hi", "hey"))
+        val adapter = FaceIdAdapter()
         face_id_recycler_view.adapter = adapter
 
         detector.setProcessor(
@@ -144,7 +144,7 @@ class EmotionDetectionActivity : AppCompatActivity() {
 
     class FirebaseVisionDetectorWrapper(private val firebaseVisionFaceDetector: FirebaseVisionFaceDetector) :
             Detector<FirebaseVisionFace>() {
-
+// TODO: Vision and bitmap
         override fun detect(frame: Frame?): SparseArray<FirebaseVisionFace> {
             Log.d("test", "detect")
             if (frame != null) {
