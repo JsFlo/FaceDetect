@@ -7,27 +7,22 @@
     android:background="@color/primary_light"
     tools:context=".EmotionDetectionActivity">
 
-    <ImageView
-        android:id="@+id/face_view"
+    <com.fhc.emotionrec.facedetect.camera.PreviewSurfaceView
+        android:id="@+id/preview_surface_view"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/take_pic_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:src="@drawable/ic_photo_camera_black_24dp"
-        app:elevation="20dp"
-        app:layout_constraintBottom_toBottomOf="@id/face_view"
-        app:layout_constraintRight_toRightOf="parent" />
+    <com.fhc.emotionrec.facedetect.camera.OverlayGroupView
+        android:id="@+id/overlay_group_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
