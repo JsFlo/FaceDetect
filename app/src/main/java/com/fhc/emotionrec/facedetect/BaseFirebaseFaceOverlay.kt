@@ -28,17 +28,14 @@ abstract class BaseFirebaseFaceOverlay(@Volatile var face: FirebaseVisionFace) :
     abstract fun onDraw(canvas: Canvas, face: FirebaseVisionFace, overlayTransformations: OverlayTransformations)
 }
 
-class GraphicFaceOverlay(face: FirebaseVisionFace) : BaseFirebaseFaceOverlay(face) {
+class GraphicFaceOverlay(faceImage: EmotionDetectionActivity.FvFaceImage) : BaseFirebaseFaceOverlay(faceImage.firebaseVisionFace) {
 
     private val facePositionPaint = Paint()
     private val idPaint = Paint()
     private val boxPaint = Paint()
 
     init {
-
-        mCurrentColorIndex = (mCurrentColorIndex + 1) % COLOR_CHOICES.size
-        val selectedColor = COLOR_CHOICES[mCurrentColorIndex]
-
+        val selectedColor = faceImage.color
         facePositionPaint.color = selectedColor
 
         idPaint.color = selectedColor
@@ -75,8 +72,5 @@ class GraphicFaceOverlay(face: FirebaseVisionFace) : BaseFirebaseFaceOverlay(fac
         private val ID_Y_OFFSET = 50.0f
         private val ID_X_OFFSET = -50.0f
         private val BOX_STROKE_WIDTH = 5.0f
-
-        private val COLOR_CHOICES = intArrayOf(Color.BLUE, Color.CYAN, Color.GREEN, Color.MAGENTA, Color.RED, Color.WHITE, Color.YELLOW)
-        private var mCurrentColorIndex = 0
     }
 }

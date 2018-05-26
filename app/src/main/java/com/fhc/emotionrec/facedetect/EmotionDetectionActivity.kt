@@ -1,5 +1,6 @@
 package com.fhc.emotionrec.facedetect
 
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -29,8 +30,6 @@ class EmotionDetectionActivity : AppCompatActivity() {
         private const val REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE = 2
     }
 
-    private var imagePath: String? = null
-
     private lateinit var options: FirebaseVisionFaceDetectorOptions
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,17 +39,6 @@ class EmotionDetectionActivity : AppCompatActivity() {
                 .setModeType(FirebaseVisionFaceDetectorOptions.ACCURATE_MODE)
                 .setClassificationType(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
                 .build()
-
-        createCameraSource()
-
-//        take_pic_fab.setOnClickListener {
-//            createImageFileAndStartImageRequest()
-//        }
-    }
-
-    private var mCameraSource: CameraSource? = null
-
-    private fun createCameraSource() {
 
         val context = applicationContext
         val detector = FirebaseVisionDetectorWrapper(
@@ -63,40 +51,35 @@ class EmotionDetectionActivity : AppCompatActivity() {
         face_id_recycler_view.adapter = adapter
 
         detector.setProcessor(
-                MultiProcessor.Builder<VisionFaceImage>(GraphicFaceTrackerFactory(overlay_group_view, adapter))
+                MultiProcessor.Builder<FvFaceImage>(GraphicFaceTrackerFactory(overlay_group_view, adapter))
                         .build()
         )
 
-        mCameraSource = CameraSource.Builder(context, detector)
+        val cameraSource = CameraSource.Builder(context, detector)
                 .setRequestedPreviewSize(640, 480)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
                 .setRequestedFps(30.0f)
                 .build()
 
-        preview_surface_view.start(
-                CameraOverlaySurfaceListener(
-                        mCameraSource!!,
-                        overlay_group_view
-                )
-        )
+        preview_surface_view.start(CameraOverlaySurfaceListener(cameraSource, overlay_group_view))
     }
 
-    data class VisionFaceImage(val firebaseVisionImage: FirebaseVisionImage, val firebaseVisionFace: FirebaseVisionFace)
-
+    data class FvFaceImage(val firebaseVisionFace: FirebaseVisionFace, val firebaseVisionImage: FirebaseVisionImage, val color: Int)
 
     class GraphicFaceTrackerFactory(private val overlayGroupView: OverlayGroupView,
-                                    private val faceTrackerListener: FaceTrackerListener) :
-            MultiProcessor.Factory<VisionFaceImage> {
+                                    private val faceTrackerListener: FaceTrackerListener) : MultiProcessor.Factory<FvFaceImage> {
 
         interface FaceTrackerListener {
-            fun newItem(id: Int, faceImage: VisionFaceImage)
-            fun onUpdateItem(id: Int, faceImage: VisionFaceImage)
+            fun newItem(id: Int, faceImage: FvFaceImage)
+            fun onUpdateItem(id: Int, faceImage: FvFaceImage)
             fun onMissingItem(id: Int)
             fun onDestroyItem(id: Int)
         }
 
-        override fun create(faceImage: VisionFaceImage?): Tracker<VisionFaceImage> {
-            return FirebaseVisionFaceTracker(GraphicFaceOverlay(faceImage!!.firebaseVisionFace), overlayGroupView, faceTrackerListener)
+        override fun create(faceImage: FvFaceImage?): Tracker<FvFaceImage> {
+            return FirebaseVisionFaceTracker(
+                    GraphicFaceOverlay(faceImage!!),
+                    overlayGroupView, faceTrackerListener)
         }
     }
 
@@ -105,11 +88,11 @@ class EmotionDetectionActivity : AppCompatActivity() {
             private val overlayGroupView: OverlayGroupView,
             private var faceTrackerListener: GraphicFaceTrackerFactory.FaceTrackerListener?
     ) :
-            Tracker<VisionFaceImage>() {
+            Tracker<FvFaceImage>() {
         var id: Int = 0
 
 
-        override fun onNewItem(id: Int, faceImage: VisionFaceImage?) {
+        override fun onNewItem(id: Int, faceImage: FvFaceImage?) {
             this.id = id
             "new item".debug("FACE_TRACKER")
             faceImage?.let {
@@ -120,8 +103,8 @@ class EmotionDetectionActivity : AppCompatActivity() {
         }
 
         override fun onUpdate(
-                detectionResult: Detector.Detections<VisionFaceImage>?,
-                faceImage: VisionFaceImage?
+                detectionResult: Detector.Detections<FvFaceImage>?,
+                faceImage: FvFaceImage?
         ) {
             "onUdpate".debug("FACE_TRACKER")
             faceImage?.let {
@@ -130,7 +113,7 @@ class EmotionDetectionActivity : AppCompatActivity() {
             }
         }
 
-        override fun onMissing(detectionResult: Detector.Detections<VisionFaceImage>?) {
+        override fun onMissing(detectionResult: Detector.Detections<FvFaceImage>?) {
             "onMIssing".debug("FACE_TRACKER")
             overlayGroupView.removeOverlay(graphicFaceOverlay)
             faceTrackerListener?.onMissingItem(id)
@@ -145,23 +128,31 @@ class EmotionDetectionActivity : AppCompatActivity() {
     }
 
     class FirebaseVisionDetectorWrapper(private val firebaseVisionFaceDetector: FirebaseVisionFaceDetector) :
-            Detector<VisionFaceImage>() {
+            Detector<FvFaceImage>() {
+
+        companion object {
+            private val COLOR_CHOICES = intArrayOf(Color.BLUE, Color.CYAN, Color.GREEN, Color.MAGENTA, Color.RED, Color.WHITE, Color.YELLOW)
+            private var mCurrentColorIndex = 0
+        }
+
         // TODO: Vision and bitmap
-        override fun detect(frame: Frame?): SparseArray<VisionFaceImage> {
+        override fun detect(frame: Frame?): SparseArray<FvFaceImage> {
             Log.d("test", "detect")
             if (frame != null) {
                 Log.d("test", "frame not null")
-                val image =
+                val fvImage =
                         FirebaseVisionImage.fromByteBuffer(frame.grayscaleImageData, frame.metadata.toFirebaseVisionMetaData())
 
                 val result = runBlocking {
-                    firebaseVisionFaceDetector.detectImageSync(image)
+                    firebaseVisionFaceDetector.detectImageSync(fvImage)
                 }
 
-                val sparseArray = SparseArray<VisionFaceImage>()
-                result?.forEachIndexed { index, firebaseVisionFace ->
-                    Log.d("test", "image!")
-                    sparseArray.put(index, VisionFaceImage(image, firebaseVisionFace))
+                mCurrentColorIndex = (mCurrentColorIndex + 1) % COLOR_CHOICES.size
+                val selectedColor: Int = COLOR_CHOICES[mCurrentColorIndex]
+                val sparseArray = SparseArray<FvFaceImage>()
+                result?.forEachIndexed { index, fvFace ->
+                    Log.d("test", "fvImage!")
+                    sparseArray.put(index, FvFaceImage(fvFace, fvImage, selectedColor))
                 }
                 return sparseArray
             } else {

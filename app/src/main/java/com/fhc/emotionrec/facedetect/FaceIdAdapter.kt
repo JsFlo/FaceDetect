@@ -7,14 +7,14 @@ import android.view.ViewGroup
 import kotlinx.android.synthetic.main.view_face_id.view.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
-import com.fhc.emotionrec.facedetect.EmotionDetectionActivity.VisionFaceImage
+import com.fhc.emotionrec.facedetect.EmotionDetectionActivity.FvFaceImage
 
-data class FaceId(val id: Int, val faceImage: VisionFaceImage) {
+data class FaceId(val id: Int, val faceImage: FvFaceImage) {
 
 }
 
 class FaceIdAdapter(private val idFace: MutableList<FaceId> = mutableListOf()) : RecyclerView.Adapter<FaceIdViewHolder>(), EmotionDetectionActivity.GraphicFaceTrackerFactory.FaceTrackerListener {
-    override fun newItem(id: Int, face: VisionFaceImage) {
+    override fun newItem(id: Int, face: FvFaceImage) {
         "new Item".debug("faceId")
         idFace.add(FaceId(id, face))
         launch(UI) {
@@ -22,7 +22,7 @@ class FaceIdAdapter(private val idFace: MutableList<FaceId> = mutableListOf()) :
         }
     }
 
-    override fun onUpdateItem(id: Int, face: VisionFaceImage) {
+    override fun onUpdateItem(id: Int, face: FvFaceImage) {
 //        idLi
     }
 
@@ -50,6 +50,7 @@ class FaceIdAdapter(private val idFace: MutableList<FaceId> = mutableListOf()) :
         val idFace = idFace[position]
         holder.itemView.face_id_text.text = idFace.id.toString()
         holder.itemView.face_id_image.setImageBitmap(idFace.faceImage.firebaseVisionImage.bitmapForDebugging)
+        holder.itemView.face_id_image.borderColor = idFace.faceImage.color
 
     }
 
