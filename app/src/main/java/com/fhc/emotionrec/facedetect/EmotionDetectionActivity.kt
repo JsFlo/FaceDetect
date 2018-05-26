@@ -30,12 +30,20 @@ class EmotionDetectionActivity : AppCompatActivity() {
         private const val REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE = 2
     }
 
-    private lateinit var options: FirebaseVisionFaceDetectorOptions
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_emotion_detection)
-        options = FirebaseVisionFaceDetectorOptions.Builder()
+
+        face_id_recycler_view.layoutManager = LinearLayoutManager(this)
+        val adapter = FaceIdAdapter(object : FaceIdAdapter.Listener {
+            override fun onFaceImageClicked(faceImage: FvFaceImage) {
+                startActivity(FaceDetail.newIntent(this@EmotionDetectionActivity))
+            }
+
+        })
+        face_id_recycler_view.adapter = adapter
+
+        val options = FirebaseVisionFaceDetectorOptions.Builder()
                 .setModeType(FirebaseVisionFaceDetectorOptions.ACCURATE_MODE)
                 .setClassificationType(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
                 .build()
@@ -45,10 +53,6 @@ class EmotionDetectionActivity : AppCompatActivity() {
                 FirebaseVision.getInstance()
                         .getVisionFaceDetector(options)
         )
-
-        face_id_recycler_view.layoutManager = LinearLayoutManager(this)
-        val adapter = FaceIdAdapter()
-        face_id_recycler_view.adapter = adapter
 
         detector.setProcessor(
                 MultiProcessor.Builder<FvFaceImage>(GraphicFaceTrackerFactory(overlay_group_view, adapter))

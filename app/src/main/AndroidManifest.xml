@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.fhc.emotionrec.facedetect">
+
     <meta-data
         android:name="com.google.firebase.ml.vision.DEPENDENCIES"
         android:value="face" />
@@ -18,12 +19,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".EmotionDetectionActivity">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-    </activity>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -33,6 +35,8 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <activity android:name=".FaceDetail"></activity>
     </application>
 
 </manifest>

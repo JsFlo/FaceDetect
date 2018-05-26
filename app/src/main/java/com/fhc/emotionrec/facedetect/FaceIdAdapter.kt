@@ -13,7 +13,13 @@ data class FaceId(val id: Int, val faceImage: FvFaceImage) {
 
 }
 
-class FaceIdAdapter(private val idFace: MutableList<FaceId> = mutableListOf()) : RecyclerView.Adapter<FaceIdViewHolder>(), EmotionDetectionActivity.GraphicFaceTrackerFactory.FaceTrackerListener {
+class FaceIdAdapter(private val listener: Listener, private val idFace: MutableList<FaceId> = mutableListOf()) : RecyclerView.Adapter<FaceIdViewHolder>(),
+        EmotionDetectionActivity.GraphicFaceTrackerFactory.FaceTrackerListener, FaceIdViewHolder.Listener {
+
+    interface Listener {
+        fun onFaceImageClicked(faceImage: FvFaceImage)
+    }
+
     override fun newItem(id: Int, face: FvFaceImage) {
         "new Item".debug("faceId")
         idFace.add(FaceId(id, face))
@@ -43,7 +49,7 @@ class FaceIdAdapter(private val idFace: MutableList<FaceId> = mutableListOf()) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FaceIdViewHolder {
         val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.view_face_id, parent, false)
-        return FaceIdViewHolder(view)
+        return FaceIdViewHolder(view, this)
     }
 
     override fun onBindViewHolder(holder: FaceIdViewHolder, position: Int) {
@@ -51,10 +57,25 @@ class FaceIdAdapter(private val idFace: MutableList<FaceId> = mutableListOf()) :
         holder.itemView.face_id_text.text = idFace.id.toString()
         holder.itemView.face_id_image.setImageBitmap(idFace.faceImage.firebaseVisionImage.bitmapForDebugging)
         holder.itemView.face_id_image.borderColor = idFace.faceImage.color
+    }
 
+    override fun onFaceClicked(adapterPosition: Int) {
+        listener.onFaceImageClicked(idFace[adapterPosition].faceImage)
     }
 
     override fun getItemCount() = idFace.size
 }
 
-class FaceIdViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+class FaceIdViewHolder(itemView: View, val listener: Listener) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    interface Listener {
+        fun onFaceClicked(adapterPosition: Int)
+    }
+
+    init {
+        itemView.face_id_image.setOnClickListener(this)
+    }
+
+    override fun onClick(v: View?) {
+        listener.onFaceClicked(adapterPosition)
+    }
+}
