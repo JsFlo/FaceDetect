@@ -36,7 +36,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".FaceDetail"></activity>
+        <activity android:name=".FaceDetailActivity"></activity>
     </application>
 
 </manifest>

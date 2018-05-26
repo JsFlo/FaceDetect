@@ -5,11 +5,11 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 
-class FaceDetail : AppCompatActivity() {
+class FaceDetailActivity : AppCompatActivity() {
 
     companion object {
         fun newIntent(context: Context): Intent {
-            return Intent(context, FaceDetail::class.java)
+            return Intent(context, FaceDetailActivity::class.java)
         }
     }
 

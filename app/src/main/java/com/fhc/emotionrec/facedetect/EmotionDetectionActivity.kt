@@ -37,7 +37,7 @@ class EmotionDetectionActivity : AppCompatActivity() {
         face_id_recycler_view.layoutManager = LinearLayoutManager(this)
         val adapter = FaceIdAdapter(object : FaceIdAdapter.Listener {
             override fun onFaceImageClicked(faceImage: FvFaceImage) {
-                startActivity(FaceDetail.newIntent(this@EmotionDetectionActivity))
+                startActivity(FaceDetailActivity.newIntent(this@EmotionDetectionActivity))
             }
 
         })

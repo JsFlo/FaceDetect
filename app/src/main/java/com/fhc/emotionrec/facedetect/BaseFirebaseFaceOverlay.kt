@@ -58,11 +58,11 @@ class GraphicFaceOverlay(faceImage: EmotionDetectionActivity.FvFaceImage) : Base
 //            canvas.drawText("happiness: " + String.format("%.2f", face.getIsSmilingProbability()), x - ID_X_OFFSET, y - ID_Y_OFFSET, mIdPaint)
 //            canvas.drawText("right eye: " + String.format("%.2f", face.getIsRightEyeOpenProbability()), x + ID_X_OFFSET * 2, y + ID_Y_OFFSET * 2, mIdPaint)
 //            canvas.drawText("left eye: " + String.format("%.2f", face.getIsLeftEyeOpenProbability()), x - ID_X_OFFSET * 2, y - ID_Y_OFFSET * 2, mIdPaint)
-
-            canvas.drawRect(translateX(face.boundingBox.left.toFloat()),
-                    translateY(face.boundingBox.top.toFloat()),
-                    translateX(face.boundingBox.right.toFloat()),
-                    translateY(face.boundingBox.bottom.toFloat()), boxPaint)
+            canvas.drawCircle(translateX(centerX), translateY(centerY),face.boundingBox.left.toFloat() - translateX(centerX), boxPaint)
+//            canvas.drawRect(translateX(face.boundingBox.left.toFloat()),
+//                    translateY(face.boundingBox.top.toFloat()),
+//                    translateX(face.boundingBox.right.toFloat()),
+//                    translateY(face.boundingBox.bottom.toFloat()), boxPaint)
         }
     }
 
