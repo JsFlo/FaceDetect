@@ -63,7 +63,7 @@ class EmotionDetectionActivity : AppCompatActivity() {
         face_id_recycler_view.adapter = adapter
 
         detector.setProcessor(
-                MultiProcessor.Builder<FirebaseVisionFace>(GraphicFaceTrackerFactory(overlay_group_view, adapter))
+                MultiProcessor.Builder<VisionFaceImage>(GraphicFaceTrackerFactory(overlay_group_view, adapter))
                         .build()
         )
 
@@ -81,20 +81,22 @@ class EmotionDetectionActivity : AppCompatActivity() {
         )
     }
 
+    data class VisionFaceImage(val firebaseVisionImage: FirebaseVisionImage, val firebaseVisionFace: FirebaseVisionFace)
+
 
     class GraphicFaceTrackerFactory(private val overlayGroupView: OverlayGroupView,
                                     private val faceTrackerListener: FaceTrackerListener) :
-            MultiProcessor.Factory<FirebaseVisionFace> {
+            MultiProcessor.Factory<VisionFaceImage> {
 
         interface FaceTrackerListener {
-            fun newItem(id: Int, face: FirebaseVisionFace)
-            fun onUpdateItem(id: Int, face: FirebaseVisionFace)
+            fun newItem(id: Int, faceImage: VisionFaceImage)
+            fun onUpdateItem(id: Int, faceImage: VisionFaceImage)
             fun onMissingItem(id: Int)
             fun onDestroyItem(id: Int)
         }
 
-        override fun create(face: FirebaseVisionFace?): Tracker<FirebaseVisionFace> {
-            return FirebaseVisionFaceTracker(GraphicFaceOverlay(face!!), overlayGroupView, faceTrackerListener)
+        override fun create(faceImage: VisionFaceImage?): Tracker<VisionFaceImage> {
+            return FirebaseVisionFaceTracker(GraphicFaceOverlay(faceImage!!.firebaseVisionFace), overlayGroupView, faceTrackerListener)
         }
     }
 
@@ -103,32 +105,32 @@ class EmotionDetectionActivity : AppCompatActivity() {
             private val overlayGroupView: OverlayGroupView,
             private var faceTrackerListener: GraphicFaceTrackerFactory.FaceTrackerListener?
     ) :
-            Tracker<FirebaseVisionFace>() {
+            Tracker<VisionFaceImage>() {
         var id: Int = 0
 
-        override fun onNewItem(id: Int, face: FirebaseVisionFace?) {
+
+        override fun onNewItem(id: Int, faceImage: VisionFaceImage?) {
             this.id = id
             "new item".debug("FACE_TRACKER")
-            face?.let {
+            faceImage?.let {
                 overlayGroupView.addOverlay(graphicFaceOverlay)
-                graphicFaceOverlay.updateFace(face)
-                faceTrackerListener?.newItem(id, face)
+                graphicFaceOverlay.updateFace(faceImage.firebaseVisionFace)
+                faceTrackerListener?.newItem(id, faceImage)
             }
         }
-
 
         override fun onUpdate(
-                detectionResult: Detector.Detections<FirebaseVisionFace>?,
-                face: FirebaseVisionFace?
+                detectionResult: Detector.Detections<VisionFaceImage>?,
+                faceImage: VisionFaceImage?
         ) {
             "onUdpate".debug("FACE_TRACKER")
-            face?.let {
-                graphicFaceOverlay.updateFace(face)
-                faceTrackerListener?.onUpdateItem(id, face)
+            faceImage?.let {
+                graphicFaceOverlay.updateFace(faceImage.firebaseVisionFace)
+                faceTrackerListener?.onUpdateItem(id, faceImage)
             }
         }
 
-        override fun onMissing(detectionResult: Detector.Detections<FirebaseVisionFace>?) {
+        override fun onMissing(detectionResult: Detector.Detections<VisionFaceImage>?) {
             "onMIssing".debug("FACE_TRACKER")
             overlayGroupView.removeOverlay(graphicFaceOverlay)
             faceTrackerListener?.onMissingItem(id)
@@ -143,30 +145,23 @@ class EmotionDetectionActivity : AppCompatActivity() {
     }
 
     class FirebaseVisionDetectorWrapper(private val firebaseVisionFaceDetector: FirebaseVisionFaceDetector) :
-            Detector<FirebaseVisionFace>() {
-// TODO: Vision and bitmap
-        override fun detect(frame: Frame?): SparseArray<FirebaseVisionFace> {
+            Detector<VisionFaceImage>() {
+        // TODO: Vision and bitmap
+        override fun detect(frame: Frame?): SparseArray<VisionFaceImage> {
             Log.d("test", "detect")
             if (frame != null) {
                 Log.d("test", "frame not null")
-                val metadata = FirebaseVisionImageMetadata.Builder()
-                        .setWidth(frame.metadata.width)
-                        .setHeight(frame.metadata.height)
-//                    .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
-                        .setFormat(frame.metadata.format)
-                        .setRotation(frame.metadata.rotation)
-                        .build()
                 val image =
-                        FirebaseVisionImage.fromByteBuffer(frame.grayscaleImageData, metadata)
+                        FirebaseVisionImage.fromByteBuffer(frame.grayscaleImageData, frame.metadata.toFirebaseVisionMetaData())
 
                 val result = runBlocking {
                     firebaseVisionFaceDetector.detectImageSync(image)
                 }
 
-                val sparseArray = SparseArray<FirebaseVisionFace>()
+                val sparseArray = SparseArray<VisionFaceImage>()
                 result?.forEachIndexed { index, firebaseVisionFace ->
                     Log.d("test", "image!")
-                    sparseArray.put(index, firebaseVisionFace)
+                    sparseArray.put(index, VisionFaceImage(image, firebaseVisionFace))
                 }
                 return sparseArray
             } else {
@@ -174,6 +169,16 @@ class EmotionDetectionActivity : AppCompatActivity() {
             }
         }
     }
+}
+
+fun Frame.Metadata.toFirebaseVisionMetaData(): FirebaseVisionImageMetadata {
+    return FirebaseVisionImageMetadata.Builder()
+            .setWidth(width)
+            .setHeight(height)
+//                    .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
+            .setFormat(format)
+            .setRotation(rotation)
+            .build()
 }
 
 suspend fun FirebaseVisionFaceDetector.detectImageSync(firebaseVisionImage: FirebaseVisionImage): List<FirebaseVisionFace>? {

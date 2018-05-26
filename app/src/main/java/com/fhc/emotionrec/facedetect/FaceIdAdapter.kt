@@ -4,19 +4,17 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import kotlinx.android.synthetic.main.view_face_id.view.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
-import java.util.Iterator
-import java.util.function.Predicate
+import com.fhc.emotionrec.facedetect.EmotionDetectionActivity.VisionFaceImage
 
-data class FaceId(val id: Int, val face: FirebaseVisionFace) {
+data class FaceId(val id: Int, val faceImage: VisionFaceImage) {
 
 }
 
 class FaceIdAdapter(private val idFace: MutableList<FaceId> = mutableListOf()) : RecyclerView.Adapter<FaceIdViewHolder>(), EmotionDetectionActivity.GraphicFaceTrackerFactory.FaceTrackerListener {
-    override fun newItem(id: Int, face: FirebaseVisionFace) {
+    override fun newItem(id: Int, face: VisionFaceImage) {
         "new Item".debug("faceId")
         idFace.add(FaceId(id, face))
         launch(UI) {
@@ -24,7 +22,7 @@ class FaceIdAdapter(private val idFace: MutableList<FaceId> = mutableListOf()) :
         }
     }
 
-    override fun onUpdateItem(id: Int, face: FirebaseVisionFace) {
+    override fun onUpdateItem(id: Int, face: VisionFaceImage) {
 //        idLi
     }
 
@@ -51,7 +49,7 @@ class FaceIdAdapter(private val idFace: MutableList<FaceId> = mutableListOf()) :
     override fun onBindViewHolder(holder: FaceIdViewHolder, position: Int) {
         val idFace = idFace[position]
         holder.itemView.face_id_text.text = idFace.id.toString()
-        holder.itemView.face_id_image.setImageBitmap()
+        holder.itemView.face_id_image.setImageBitmap(idFace.faceImage.firebaseVisionImage.bitmapForDebugging)
 
     }
 
