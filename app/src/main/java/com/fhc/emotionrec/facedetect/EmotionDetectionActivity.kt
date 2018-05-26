@@ -1,7 +1,10 @@
 package com.fhc.emotionrec.facedetect
 
+import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.Rect
 import android.os.Bundle
+import android.os.Parcelable
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
@@ -15,6 +18,8 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
+import kotlinx.android.parcel.Parcelize
+
 import kotlinx.android.synthetic.main.activity_emotion_detection.*
 import kotlinx.coroutines.experimental.runBlocking
 import kotlin.coroutines.experimental.suspendCoroutine
@@ -37,7 +42,7 @@ class EmotionDetectionActivity : AppCompatActivity() {
         face_id_recycler_view.layoutManager = LinearLayoutManager(this)
         val adapter = FaceIdAdapter(object : FaceIdAdapter.Listener {
             override fun onFaceImageClicked(faceImage: FvFaceImage) {
-                startActivity(FaceDetailActivity.newIntent(this@EmotionDetectionActivity))
+                startActivity(FaceDetailActivity.newIntent(this@EmotionDetectionActivity, faceImage))
             }
 
         })
@@ -68,7 +73,26 @@ class EmotionDetectionActivity : AppCompatActivity() {
         preview_surface_view.start(CameraOverlaySurfaceListener(cameraSource, overlay_group_view))
     }
 
-    data class FvFaceImage(val firebaseVisionFace: FirebaseVisionFace, val firebaseVisionImage: FirebaseVisionImage, val color: Int)
+    @Parcelize
+    data class FvFaceImage(
+            val smilingProb: Float,
+            val leftEyeProb: Float,
+            val rightEyeProb: Float,
+            val imageBitmap: Bitmap,
+            val boundingBox: Rect,
+            val color: Int) : Parcelable {
+        companion object {
+            fun create(firebaseVisionFace: FirebaseVisionFace, firebaseVisionImage: FirebaseVisionImage, color: Int): FvFaceImage {
+                return FvFaceImage(firebaseVisionFace.smilingProbability,
+                        firebaseVisionFace.leftEyeOpenProbability,
+                        firebaseVisionFace.rightEyeOpenProbability,
+                        firebaseVisionImage.bitmapForDebugging,
+                        firebaseVisionFace.boundingBox,
+                        color)
+            }
+        }
+    }
+//            val firebaseVisionFace: FirebaseVisionFace, val firebaseVisionImage: FirebaseVisionImage, val color: Int) : Parcelable
 
     class GraphicFaceTrackerFactory(private val overlayGroupView: OverlayGroupView,
                                     private val faceTrackerListener: FaceTrackerListener) : MultiProcessor.Factory<FvFaceImage> {
@@ -101,7 +125,7 @@ class EmotionDetectionActivity : AppCompatActivity() {
             "new item".debug("FACE_TRACKER")
             faceImage?.let {
                 overlayGroupView.addOverlay(graphicFaceOverlay)
-                graphicFaceOverlay.updateFace(faceImage.firebaseVisionFace)
+                graphicFaceOverlay.updateFace(faceImage)
                 faceTrackerListener?.newItem(id, faceImage)
             }
         }
@@ -112,7 +136,7 @@ class EmotionDetectionActivity : AppCompatActivity() {
         ) {
             "onUdpate".debug("FACE_TRACKER")
             faceImage?.let {
-                graphicFaceOverlay.updateFace(faceImage.firebaseVisionFace)
+                graphicFaceOverlay.updateFace(faceImage)
                 faceTrackerListener?.onUpdateItem(id, faceImage)
             }
         }
@@ -156,7 +180,7 @@ class EmotionDetectionActivity : AppCompatActivity() {
                 val sparseArray = SparseArray<FvFaceImage>()
                 result?.forEachIndexed { index, fvFace ->
                     Log.d("test", "fvImage!")
-                    sparseArray.put(index, FvFaceImage(fvFace, fvImage, selectedColor))
+                    sparseArray.put(index, FvFaceImage.create(fvFace, fvImage, selectedColor))
                 }
                 return sparseArray
             } else {

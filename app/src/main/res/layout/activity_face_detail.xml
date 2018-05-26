@@ -44,6 +44,7 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <com.fhc.emotionrec.facedetect.ui.FaceDetailStatsView
+            android:id="@+id/face_details_stats_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </android.support.v4.widget.NestedScrollView>

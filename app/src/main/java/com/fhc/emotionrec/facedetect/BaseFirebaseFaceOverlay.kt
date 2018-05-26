@@ -4,19 +4,20 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import androidx.core.graphics.withTranslation
+import com.fhc.emotionrec.facedetect.EmotionDetectionActivity.FvFaceImage
 import com.fhc.emotionrec.facedetect.camera.Overlay
 import com.fhc.emotionrec.facedetect.camera.OverlayTransformations
 import com.google.firebase.ml.vision.face.FirebaseVisionFace
 
 
-abstract class BaseFirebaseFaceOverlay(@Volatile var face: FirebaseVisionFace) : Overlay() {
+abstract class BaseFirebaseFaceOverlay(@Volatile var face: FvFaceImage) : Overlay() {
 
     private var overlayTransformations: OverlayTransformations? = null
     override fun onCreate(overlayTransformations: OverlayTransformations) {
         this.overlayTransformations = overlayTransformations
     }
 
-    fun updateFace(newFace: FirebaseVisionFace) {
+    fun updateFace(newFace: FvFaceImage) {
         face = newFace
         overlayTransformations?.postInvalidate()
     }
@@ -25,10 +26,10 @@ abstract class BaseFirebaseFaceOverlay(@Volatile var face: FirebaseVisionFace) :
         overlayTransformations?.let { onDraw(canvas, face, it) }
     }
 
-    abstract fun onDraw(canvas: Canvas, face: FirebaseVisionFace, overlayTransformations: OverlayTransformations)
+    abstract fun onDraw(canvas: Canvas, face: FvFaceImage, overlayTransformations: OverlayTransformations)
 }
 
-class GraphicFaceOverlay(faceImage: EmotionDetectionActivity.FvFaceImage) : BaseFirebaseFaceOverlay(faceImage.firebaseVisionFace) {
+class GraphicFaceOverlay(faceImage: FvFaceImage) : BaseFirebaseFaceOverlay(faceImage) {
 
     private val facePositionPaint = Paint()
     private val idPaint = Paint()
@@ -46,7 +47,7 @@ class GraphicFaceOverlay(faceImage: EmotionDetectionActivity.FvFaceImage) : Base
         boxPaint.strokeWidth = BOX_STROKE_WIDTH
     }
 
-    override fun onDraw(canvas: Canvas, face: FirebaseVisionFace, overlayTransformations: OverlayTransformations) {
+    override fun onDraw(canvas: Canvas, face: FvFaceImage, overlayTransformations: OverlayTransformations) {
         with(overlayTransformations) {
 
             val centerX = face.boundingBox.exactCenterX()

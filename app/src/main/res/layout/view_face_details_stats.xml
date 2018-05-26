@@ -5,12 +5,35 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/face_detail_smiling_prob"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="hellloooo"
+        android:text="smiling prob: "
+        android:textColor="@color/secondary_text"
+        app:layout_constraintBottom_toTopOf="@id/face_detail_left_eye_prob"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/face_detail_left_eye_prob"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="left eye: "
+        android:textColor="@color/secondary_text"
+        app:layout_constraintBottom_toTopOf="@id/face_detail_right_eye_prob"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/face_detail_smiling_prob" />
+
+    <TextView
+        android:id="@+id/face_detail_right_eye_prob"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="right eye: "
         android:textColor="@color/secondary_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/face_detail_left_eye_prob" />
 </android.support.constraint.ConstraintLayout>

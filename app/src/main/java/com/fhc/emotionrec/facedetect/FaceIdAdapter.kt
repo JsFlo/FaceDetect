@@ -55,7 +55,7 @@ class FaceIdAdapter(private val listener: Listener, private val idFace: MutableL
     override fun onBindViewHolder(holder: FaceIdViewHolder, position: Int) {
         val idFace = idFace[position]
         holder.itemView.face_id_text.text = idFace.id.toString()
-        holder.itemView.face_id_image.setImageBitmap(idFace.faceImage.firebaseVisionImage.bitmapForDebugging)
+        holder.itemView.face_id_image.setImageBitmap(idFace.faceImage.imageBitmap)
         holder.itemView.face_id_image.borderColor = idFace.faceImage.color
     }
 
