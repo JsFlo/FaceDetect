@@ -18,6 +18,5 @@ class FaceDetailStatsView(context: Context, attrs: AttributeSet) : ConstraintLay
         face_detail_smiling_prob.text = face_detail_smiling_prob.text.toString() + faceImage.smilingProb.toString()
         face_detail_left_eye_prob.text = face_detail_left_eye_prob.text.toString() + faceImage.leftEyeProb.toString()
         face_detail_right_eye_prob.text = face_detail_right_eye_prob.text.toString() + faceImage.rightEyeProb.toString()
-        face_detail_hero_image.setImageBitmap(faceImage.imageBitmap)
     }
 }

@@ -20,6 +20,13 @@
             app:expandedTitleMarginStart="48dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
+            <ImageView
+                android:id="@+id/face_detail_hero_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scaleType="fitCenter"
+                android:src="@drawable/common_full_open_on_phone" />
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/technique_three_toolbar"
                 android:layout_width="match_parent"
@@ -29,12 +36,6 @@
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
         </android.support.design.widget.CollapsingToolbarLayout>
-
-        <ImageView
-            android:id="@+id/face_detail_hero_image"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:src="@drawable/common_full_open_on_phone" />
 
     </android.support.design.widget.AppBarLayout>
 

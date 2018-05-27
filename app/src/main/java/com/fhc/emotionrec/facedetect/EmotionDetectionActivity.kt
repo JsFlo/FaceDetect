@@ -1,14 +1,19 @@
 package com.fhc.emotionrec.facedetect
 
+import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Rect
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.os.Parcelable
+import android.provider.MediaStore
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.util.SparseArray
+import androidx.core.net.toUri
 import com.fhc.emotionrec.facedetect.camera.CameraOverlaySurfaceListener
 import com.fhc.emotionrec.facedetect.camera.OverlayGroupView
 import com.google.android.gms.vision.*
@@ -22,6 +27,8 @@ import kotlinx.android.parcel.Parcelize
 
 import kotlinx.android.synthetic.main.activity_emotion_detection.*
 import kotlinx.coroutines.experimental.runBlocking
+import java.io.File
+import java.util.*
 import kotlin.coroutines.experimental.suspendCoroutine
 
 
@@ -42,7 +49,7 @@ class EmotionDetectionActivity : AppCompatActivity() {
         face_id_recycler_view.layoutManager = LinearLayoutManager(this)
         val adapter = FaceIdAdapter(object : FaceIdAdapter.Listener {
             override fun onFaceImageClicked(faceImage: FvFaceImage) {
-                startActivity(FaceDetailActivity.newIntent(this@EmotionDetectionActivity, faceImage))
+                startActivity(FaceDetailActivity.newIntent(this@EmotionDetectionActivity, FvFaceImageParcel.create(contentResolver, faceImage)))
             }
 
         })
@@ -73,14 +80,53 @@ class EmotionDetectionActivity : AppCompatActivity() {
         preview_surface_view.start(CameraOverlaySurfaceListener(cameraSource, overlay_group_view))
     }
 
+
     @Parcelize
+    data class FvFaceImageParcel(val smilingProb: Float,
+                                 val leftEyeProb: Float,
+                                 val rightEyeProb: Float,
+                                 val imageBitmapUri: Uri,
+                                 val boundingBox: Rect,
+                                 val color: Int) : Parcelable {
+        companion object {
+            fun imageToUri(contentResolver: ContentResolver, bitmap: Bitmap): Uri {
+                val path = Environment.getExternalStorageDirectory().toString()
+
+                val file = File(path, "bitmap_${Date()}.png")
+                file.outputStream().use {
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 85, it)
+                }
+                MediaStore.Images.Media.insertImage(contentResolver, file.absolutePath, file.name, file.name)
+                return file.toUri()
+            }
+
+            fun create(contentResolver: ContentResolver, faceImage: FvFaceImage): FvFaceImageParcel {
+                with(faceImage) {
+
+//                    val tmpFile = createTempFile()
+//                    val out = tmpFile.outputStream()
+//                    imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+//                    out.close()
+
+                    return FvFaceImageParcel(smilingProb,
+                            leftEyeProb,
+                            rightEyeProb,
+                            imageToUri(contentResolver, imageBitmap),
+                            boundingBox,
+                            color)
+                }
+
+            }
+        }
+    }
+
     data class FvFaceImage(
             val smilingProb: Float,
             val leftEyeProb: Float,
             val rightEyeProb: Float,
             val imageBitmap: Bitmap,
             val boundingBox: Rect,
-            val color: Int) : Parcelable {
+            val color: Int) {
         companion object {
             fun create(firebaseVisionFace: FirebaseVisionFace, firebaseVisionImage: FirebaseVisionImage, color: Int): FvFaceImage {
                 return FvFaceImage(firebaseVisionFace.smilingProbability,
