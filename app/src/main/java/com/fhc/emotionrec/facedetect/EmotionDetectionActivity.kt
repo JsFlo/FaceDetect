@@ -42,6 +42,12 @@ class EmotionDetectionActivity : AppCompatActivity() {
         private const val REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE = 2
     }
 
+    private var graphicListener: CameraOverlaySurfaceListener? = null
+
+    private var faceTrackerProcessor: MultiProcessor<FvFaceImage>? = null
+
+    private var mlKitFaceDetector: FirebaseVisionFaceDetector? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_emotion_detection)
@@ -60,24 +66,38 @@ class EmotionDetectionActivity : AppCompatActivity() {
                 .setClassificationType(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
                 .build()
 
-        val context = applicationContext
-        val detector = FirebaseVisionDetectorWrapper(
-                FirebaseVision.getInstance()
-                        .getVisionFaceDetector(options)
-        )
-
-        detector.setProcessor(
-                MultiProcessor.Builder<FvFaceImage>(GraphicFaceTrackerFactory(overlay_group_view, adapter))
-                        .build()
-        )
-
-        val cameraSource = CameraSource.Builder(context, detector)
-                .setRequestedPreviewSize(640, 480)
-                .setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setRequestedFps(30.0f)
+        mlKitFaceDetector = FirebaseVision.getInstance()
+                .getVisionFaceDetector(options)
+        faceTrackerProcessor = MultiProcessor.Builder<FvFaceImage>(GraphicFaceTrackerFactory(overlay_group_view, adapter))
                 .build()
 
-        preview_surface_view.start(CameraOverlaySurfaceListener(cameraSource, overlay_group_view))
+    }
+
+    private var detector: FirebaseVisionDetectorWrapper? = null
+
+    override fun onResume() {
+        super.onResume()
+
+        if (detector?.isOperational == true && graphicListener != null) {
+            preview_surface_view.start(graphicListener!!)
+        } else {
+            detector = FirebaseVisionDetectorWrapper(mlKitFaceDetector!!)
+            detector?.setProcessor(faceTrackerProcessor)
+
+            val cameraSource = CameraSource.Builder(this, detector)
+                    .setRequestedPreviewSize(640, 480)
+                    .setFacing(CameraSource.CAMERA_FACING_BACK)
+                    .setRequestedFps(30.0f)
+                    .build()
+
+            graphicListener = CameraOverlaySurfaceListener(cameraSource, overlay_group_view)
+            preview_surface_view.start(graphicListener!!)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        preview_surface_view.stop()
     }
 
 
@@ -103,7 +123,7 @@ class EmotionDetectionActivity : AppCompatActivity() {
             fun create(contentResolver: ContentResolver, faceImage: FvFaceImage): FvFaceImageParcel {
                 with(faceImage) {
 
-//                    val tmpFile = createTempFile()
+                    //                    val tmpFile = createTempFile()
 //                    val out = tmpFile.outputStream()
 //                    imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
 //                    out.close()
@@ -204,9 +224,20 @@ class EmotionDetectionActivity : AppCompatActivity() {
     class FirebaseVisionDetectorWrapper(private val firebaseVisionFaceDetector: FirebaseVisionFaceDetector) :
             Detector<FvFaceImage>() {
 
+        private var releaseCalled = false
+
         companion object {
             private val COLOR_CHOICES = intArrayOf(Color.BLUE, Color.CYAN, Color.GREEN, Color.MAGENTA, Color.RED, Color.WHITE, Color.YELLOW)
             private var mCurrentColorIndex = 0
+        }
+
+        override fun isOperational(): Boolean {
+            return !releaseCalled
+        }
+
+        override fun release() {
+            releaseCalled = true
+            super.release()
         }
 
         // TODO: Vision and bitmap

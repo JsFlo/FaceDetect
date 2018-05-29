@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import com.google.android.gms.vision.CameraSource
+import kotlinx.coroutines.experimental.async
 
 data class CameraInfo(val width: Int, val height: Int, val facing: Int)
 
@@ -32,7 +33,10 @@ class CameraOverlaySurfaceListener(
     }
 
     override fun stop() {
-        cameraSource.stop()
+        async {
+            cameraSource.release()
+        }
+//        cameraSource.stop()
     }
 
 }
