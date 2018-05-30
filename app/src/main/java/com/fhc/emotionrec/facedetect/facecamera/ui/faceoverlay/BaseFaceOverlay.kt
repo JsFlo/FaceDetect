@@ -1,16 +1,11 @@
-package com.fhc.emotionrec.facedetect
+package com.fhc.emotionrec.facedetect.facecamera.ui.faceoverlay
 
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
-import androidx.core.graphics.withTranslation
-import com.fhc.emotionrec.facedetect.EmotionDetectionActivity.FvFaceImage
-import com.fhc.emotionrec.facedetect.camera.Overlay
-import com.fhc.emotionrec.facedetect.camera.OverlayTransformations
-import com.google.firebase.ml.vision.face.FirebaseVisionFace
+import com.fhc.emotionrec.facedetect.facecamera.EmotionDetectionActivity.FvFaceImage
 
 
-abstract class BaseFirebaseFaceOverlay(@Volatile var face: FvFaceImage) : Overlay() {
+abstract class BaseFaceOverlay(@Volatile var face: FvFaceImage) : Overlay() {
 
     private var overlayTransformations: OverlayTransformations? = null
     override fun onCreate(overlayTransformations: OverlayTransformations) {
@@ -29,23 +24,22 @@ abstract class BaseFirebaseFaceOverlay(@Volatile var face: FvFaceImage) : Overla
     abstract fun onDraw(canvas: Canvas, face: FvFaceImage, overlayTransformations: OverlayTransformations)
 }
 
-class GraphicFaceOverlay(faceImage: FvFaceImage) : BaseFirebaseFaceOverlay(faceImage) {
+class GraphicFaceOverlay(faceImage: FvFaceImage) : BaseFaceOverlay(faceImage) {
 
     private val facePositionPaint = Paint()
-    private val idPaint = Paint()
     private val boxPaint = Paint()
 
     init {
         val selectedColor = faceImage.color
         facePositionPaint.color = selectedColor
 
-        idPaint.color = selectedColor
-        idPaint.textSize = ID_TEXT_SIZE
-
         boxPaint.color = selectedColor
         boxPaint.style = Paint.Style.STROKE
         boxPaint.strokeWidth = BOX_STROKE_WIDTH
     }
+
+    private var translatedCenterX: Float = 0f
+    private var translatedCenterY: Float = 0f
 
     override fun onDraw(canvas: Canvas, face: FvFaceImage, overlayTransformations: OverlayTransformations) {
         with(overlayTransformations) {
@@ -53,13 +47,14 @@ class GraphicFaceOverlay(faceImage: FvFaceImage) : BaseFirebaseFaceOverlay(faceI
             val centerX = face.boundingBox.exactCenterX()
             val centerY = face.boundingBox.exactCenterY()
 
-            canvas.drawCircle(translateX(centerX), translateY(centerY),
+            translatedCenterX = translateX(centerX)
+            translatedCenterY = translateY(centerY)
+
+            canvas.drawCircle(translatedCenterX, translatedCenterY,
                     FACE_POSITION_RADIUS, facePositionPaint)
 
-//            canvas.drawText("happiness: " + String.format("%.2f", face.getIsSmilingProbability()), x - ID_X_OFFSET, y - ID_Y_OFFSET, mIdPaint)
-//            canvas.drawText("right eye: " + String.format("%.2f", face.getIsRightEyeOpenProbability()), x + ID_X_OFFSET * 2, y + ID_Y_OFFSET * 2, mIdPaint)
-//            canvas.drawText("left eye: " + String.format("%.2f", face.getIsLeftEyeOpenProbability()), x - ID_X_OFFSET * 2, y - ID_Y_OFFSET * 2, mIdPaint)
-            canvas.drawCircle(translateX(centerX), translateY(centerY),face.boundingBox.left.toFloat() - translateX(centerX), boxPaint)
+            canvas.drawCircle(translatedCenterX, translatedCenterY, translatedCenterX - translateX(face.boundingBox.left.toFloat()), boxPaint)
+
 //            canvas.drawRect(translateX(face.boundingBox.left.toFloat()),
 //                    translateY(face.boundingBox.top.toFloat()),
 //                    translateX(face.boundingBox.right.toFloat()),
@@ -73,9 +68,6 @@ class GraphicFaceOverlay(faceImage: FvFaceImage) : BaseFirebaseFaceOverlay(faceI
 
     companion object {
         private val FACE_POSITION_RADIUS = 10.0f
-        private val ID_TEXT_SIZE = 40.0f
-        private val ID_Y_OFFSET = 50.0f
-        private val ID_X_OFFSET = -50.0f
         private val BOX_STROKE_WIDTH = 5.0f
     }
 }

@@ -1,10 +1,26 @@
-package com.fhc.emotionrec.facedetect.camera
+package com.fhc.emotionrec.facedetect.facecamera.ui.faceoverlay
 
 import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.View
+import com.fhc.emotionrec.facedetect.facecamera.ui.camera.CameraInfo
+import com.fhc.emotionrec.facedetect.facecamera.ui.camera.PreviewSurfaceListener
 import com.google.android.gms.vision.CameraSource
+
+interface OverlayTransformations {
+    fun scaleX(horizontal: Float): Float
+    fun scaleY(vertical: Float): Float
+    fun translateX(x: Float): Float
+    fun translateY(y: Float): Float
+    fun postInvalidate()
+}
+
+abstract class Overlay {
+    abstract fun onCreate(overlayTransformations: OverlayTransformations)
+    abstract fun draw(canvas: Canvas)
+    abstract fun clear()
+}
 
 class OverlayGroupView(context: Context, attrs: AttributeSet?) : View(context, attrs),
         OverlayTransformations, PreviewSurfaceListener {
@@ -79,18 +95,4 @@ class OverlayGroupView(context: Context, attrs: AttributeSet?) : View(context, a
 
     override fun translateY(y: Float): Float = scaleY(y)
 
-}
-
-interface OverlayTransformations {
-    fun scaleX(horizontal: Float): Float
-    fun scaleY(vertical: Float): Float
-    fun translateX(x: Float): Float
-    fun translateY(y: Float): Float
-    fun postInvalidate()
-}
-
-abstract class Overlay {
-    abstract fun onCreate(overlayTransformations: OverlayTransformations)
-    abstract fun draw(canvas: Canvas)
-    abstract fun clear()
 }

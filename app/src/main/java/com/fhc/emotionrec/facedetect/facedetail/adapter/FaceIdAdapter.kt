@@ -1,13 +1,16 @@
-package com.fhc.emotionrec.facedetect
+package com.fhc.emotionrec.facedetect.facedetail.adapter
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.fhc.emotionrec.facedetect.R
+import com.fhc.emotionrec.facedetect.facecamera.EmotionDetectionActivity
 import kotlinx.android.synthetic.main.view_face_id.view.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
-import com.fhc.emotionrec.facedetect.EmotionDetectionActivity.FvFaceImage
+import com.fhc.emotionrec.facedetect.facecamera.EmotionDetectionActivity.FvFaceImage
+import com.fhc.emotionrec.facedetect.facecamera.debug
 
 data class FaceId(val id: Int, val faceImage: FvFaceImage) {
 

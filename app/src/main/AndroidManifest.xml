@@ -18,7 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".EmotionDetectionActivity">
+        <activity android:name=".facecamera.EmotionDetectionActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -36,7 +36,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".FaceDetailActivity"></activity>
+        <activity android:name=".facedetail.FaceDetailActivity"></activity>
     </application>
 
 </manifest>

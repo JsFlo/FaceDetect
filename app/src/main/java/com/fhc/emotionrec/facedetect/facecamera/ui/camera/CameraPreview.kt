@@ -1,4 +1,4 @@
-package com.fhc.emotionrec.facedetect.camera
+package com.fhc.emotionrec.facedetect.facecamera.ui.camera
 
 import android.annotation.SuppressLint
 import android.content.Context

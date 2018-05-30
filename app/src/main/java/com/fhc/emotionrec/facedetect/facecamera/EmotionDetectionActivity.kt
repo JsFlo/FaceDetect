@@ -1,4 +1,4 @@
-package com.fhc.emotionrec.facedetect
+package com.fhc.emotionrec.facedetect.facecamera
 
 import android.content.ContentResolver
 import android.graphics.Bitmap
@@ -14,7 +14,11 @@ import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.util.SparseArray
 import androidx.core.net.toUri
-import com.fhc.emotionrec.facedetect.camera.OverlayGroupView
+import com.fhc.emotionrec.facedetect.facedetail.FaceDetailActivity
+import com.fhc.emotionrec.facedetect.facedetail.adapter.FaceIdAdapter
+import com.fhc.emotionrec.facedetect.R
+import com.fhc.emotionrec.facedetect.facecamera.ui.faceoverlay.GraphicFaceOverlay
+import com.fhc.emotionrec.facedetect.facecamera.ui.faceoverlay.OverlayGroupView
 import com.google.android.gms.vision.*
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
@@ -95,7 +99,7 @@ class EmotionDetectionActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        preview_surface_view.stop()
+        preview_surface_view.pause()
     }
 
     override fun onStop() {

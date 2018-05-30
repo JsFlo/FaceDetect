@@ -44,7 +44,7 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.fhc.emotionrec.facedetect.ui.FaceDetailStatsView
+        <com.fhc.emotionrec.facedetect.facedetail.ui.FaceDetailStatsView
             android:id="@+id/face_details_stats_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
