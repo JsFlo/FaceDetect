@@ -67,6 +67,10 @@ class GraphicFaceOverlay(faceImage: FvFaceImage) : BaseFirebaseFaceOverlay(faceI
         }
     }
 
+    override fun clear() {
+        //
+    }
+
     companion object {
         private val FACE_POSITION_RADIUS = 10.0f
         private val ID_TEXT_SIZE = 40.0f

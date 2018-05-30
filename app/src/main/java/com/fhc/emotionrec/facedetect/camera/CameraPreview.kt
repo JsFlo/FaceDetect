@@ -1,5 +1,6 @@
 package com.fhc.emotionrec.facedetect.camera
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.SurfaceHolder
@@ -36,8 +37,10 @@ class PreviewCameraSurface(context: Context, attrs: AttributeSet?) :
         holder.addCallback(this)
     }
 
+    @SuppressLint("MissingPermission")
     private fun startRequest() {
         if (startRequested && surfaceAvailable && cameraSource != null) {
+            cameraSource?.start(holder)
             cameraSource?.let {
                 val size = it.previewSize
                 val (min, max) = listOf(size.width, size.height).sorted().let { Pair(it[0], it[1]) }
@@ -48,6 +51,10 @@ class PreviewCameraSurface(context: Context, attrs: AttributeSet?) :
         }
     }
 
+    override fun addListeners(vararg previewSurfaceListeners: PreviewSurfaceListener) {
+        previewListeners = previewSurfaceListeners.toList()
+    }
+
     override fun start(cameraSource: CameraSource) {
         stop()
         startRequested = true
@@ -55,12 +62,13 @@ class PreviewCameraSurface(context: Context, attrs: AttributeSet?) :
         startRequest()
     }
 
-    override fun addListeners(vararg previewSurfaceListeners: PreviewSurfaceListener) {
-        previewListeners = previewSurfaceListeners.toList()
-    }
-
     override fun stop() {
         cameraSource?.let { async { it.release() } }
+        previewListeners?.forEach { it.stop() }
+    }
+
+    fun pause() {
+        cameraSource?.let { async { it.stop() } }
         previewListeners?.forEach { it.stop() }
     }
 
