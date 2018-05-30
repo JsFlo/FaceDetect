@@ -7,7 +7,7 @@ import android.view.View
 import com.google.android.gms.vision.CameraSource
 
 class OverlayGroupView(context: Context, attrs: AttributeSet?) : View(context, attrs),
-        OverlayTransformations {
+        OverlayTransformations, PreviewSurfaceListener {
 
     private val lock = Object()
     private var previewCameraInfo: CameraInfo? = null
@@ -16,34 +16,39 @@ class OverlayGroupView(context: Context, attrs: AttributeSet?) : View(context, a
 
     private val overlays = HashSet<Overlay>()
 
-    private fun sync(invalidate: Boolean = true, synced: () -> Unit) {
+    private fun syncAndInvalidate(invalidate: Boolean = true, synced: () -> Unit) {
         synchronized(lock, synced)
         if (invalidate) postInvalidate()
     }
 
-    fun clear() {
-        sync { overlays.clear() }
+    override fun clear() {
+        overlays.forEach { it.clear() }
+        syncAndInvalidate { overlays.clear() }
+    }
+
+    override fun onCameraInfo(cameraInfo: CameraInfo) {
+        syncAndInvalidate { previewCameraInfo = cameraInfo }
+    }
+
+    override fun stop() {
+        clear()
     }
 
     fun addOverlay(overlay: Overlay) {
-        sync {
+        syncAndInvalidate {
             overlay.onCreate(this)
             overlays.add(overlay)
         }
     }
 
     fun removeOverlay(overlay: Overlay) {
-        sync { overlays.remove(overlay) }
-    }
-
-    fun setCameraInfo(cameraInfo: CameraInfo) {
-        sync { previewCameraInfo = cameraInfo }
+        syncAndInvalidate { overlays.remove(overlay) }
     }
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
-        sync(false) {
+        syncAndInvalidate(false) {
             canvas?.let {
                 updateScaleFactors(previewCameraInfo, canvas)
                 overlays.forEach { it.draw(canvas) }
@@ -87,4 +92,5 @@ interface OverlayTransformations {
 abstract class Overlay {
     abstract fun onCreate(overlayTransformations: OverlayTransformations)
     abstract fun draw(canvas: Canvas)
+    abstract fun clear()
 }

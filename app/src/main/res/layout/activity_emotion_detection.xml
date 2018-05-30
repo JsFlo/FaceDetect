@@ -8,7 +8,7 @@
     tools:context=".EmotionDetectionActivity">
 
 
-    <com.fhc.emotionrec.facedetect.camera.PreviewSurfaceView
+    <com.fhc.emotionrec.facedetect.camera.PreviewCameraSurface
         android:id="@+id/preview_surface_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

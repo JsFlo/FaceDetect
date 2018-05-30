@@ -37,6 +37,7 @@ class FaceDetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_face_detail)
         val faceImageParcel = intent.getParcelableExtra("faceImageParcel") as FvFaceImageParcel
         val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, faceImageParcel.imageBitmapUri)
+
         face_details_stats_view.setFaceImage(FvFaceImage(faceImageParcel.smilingProb,
                 faceImageParcel.leftEyeProb, faceImageParcel.rightEyeProb, bitmap,
                 faceImageParcel.boundingBox, faceImageParcel.color))

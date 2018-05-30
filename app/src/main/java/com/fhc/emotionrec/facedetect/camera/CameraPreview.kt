@@ -1,6 +1,5 @@
 package com.fhc.emotionrec.facedetect.camera
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.SurfaceHolder
@@ -11,69 +10,62 @@ import kotlinx.coroutines.experimental.async
 data class CameraInfo(val width: Int, val height: Int, val facing: Int)
 
 interface PreviewSurfaceListener {
-    fun onHolderReady(holder: SurfaceHolder)
+    fun onCameraInfo(cameraInfo: CameraInfo)
+    fun clear()
     fun stop()
 }
 
-class CameraOverlaySurfaceListener(
-    private val cameraSource: CameraSource,
-    private val overlayGroupView: OverlayGroupView?
-) :
-        PreviewSurfaceListener {
-
-    @SuppressLint("MissingPermission")
-    override fun onHolderReady(holder: SurfaceHolder) {
-        cameraSource.start(holder)
-        overlayGroupView?.let {
-            val size = cameraSource.previewSize
-            val (min, max) = listOf(size.width, size.height).sorted().let { Pair(it[0], it[1]) }
-            overlayGroupView.setCameraInfo(CameraInfo(min, max, cameraSource.cameraFacing))
-            overlayGroupView.clear()
-        }
-    }
-
-    override fun stop() {
-        async {
-            cameraSource.release()
-        }
-//        cameraSource.stop()
-    }
-
-}
-
-interface PreviewCameraSurface {
-    fun start(previewSurfaceListener: PreviewSurfaceListener)
+interface CameraSurface {
+    fun start(cameraSource: CameraSource)
+    fun addListeners(vararg previewSurfaceListeners: PreviewSurfaceListener)
+    fun clear()
     fun stop()
 }
 
-class PreviewSurfaceView(context: Context, attrs: AttributeSet?) :
-    SurfaceView(context, attrs),
-    SurfaceHolder.Callback, PreviewCameraSurface {
+class PreviewCameraSurface(context: Context, attrs: AttributeSet?) :
+        SurfaceView(context, attrs),
+        SurfaceHolder.Callback, CameraSurface {
+
 
     private var surfaceAvailable = false
     private var startRequested = false
-    private var previewListener: PreviewSurfaceListener? = null
+    private var previewListeners: List<PreviewSurfaceListener>? = null
+    private var cameraSource: CameraSource? = null
 
     init {
         holder.addCallback(this)
     }
 
-    override fun start(previewSurfaceListener: PreviewSurfaceListener) {
+    private fun startRequest() {
+        if (startRequested && surfaceAvailable && cameraSource != null) {
+            cameraSource?.let {
+                val size = it.previewSize
+                val (min, max) = listOf(size.width, size.height).sorted().let { Pair(it[0], it[1]) }
+                val cameraInfo = CameraInfo(min, max, it.cameraFacing)
+                previewListeners?.forEach { it.onCameraInfo(cameraInfo) }
+            }
+            startRequested = false
+        }
+    }
+
+    override fun start(cameraSource: CameraSource) {
         stop()
         startRequested = true
-        previewListener = previewSurfaceListener
+        this.cameraSource = cameraSource
         startRequest()
     }
 
-    override fun stop() {
-        previewListener?.stop()
+    override fun addListeners(vararg previewSurfaceListeners: PreviewSurfaceListener) {
+        previewListeners = previewSurfaceListeners.toList()
     }
 
-    private fun startRequest() {
-        if (startRequested && surfaceAvailable) {
-            previewListener?.onHolderReady(holder)
-            startRequested = false
-        }
+    override fun stop() {
+        cameraSource?.let { async { it.release() } }
+        previewListeners?.forEach { it.stop() }
+    }
+
+    override fun clear() {
+        previewListeners?.forEach { it.clear() }
     }
 
     override fun surfaceCreated(holder: SurfaceHolder?) {

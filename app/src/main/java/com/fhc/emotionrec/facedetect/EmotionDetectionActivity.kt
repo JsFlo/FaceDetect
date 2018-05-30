@@ -14,7 +14,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.util.SparseArray
 import androidx.core.net.toUri
-import com.fhc.emotionrec.facedetect.camera.CameraOverlaySurfaceListener
 import com.fhc.emotionrec.facedetect.camera.OverlayGroupView
 import com.google.android.gms.vision.*
 import com.google.firebase.ml.vision.FirebaseVision
@@ -41,8 +40,6 @@ class EmotionDetectionActivity : AppCompatActivity() {
         private const val REQUEST_IMAGE_CAPTURE = 1
         private const val REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE = 2
     }
-
-    private var graphicListener: CameraOverlaySurfaceListener? = null
 
     private var faceTrackerProcessor: MultiProcessor<FvFaceImage>? = null
 
@@ -71,32 +68,38 @@ class EmotionDetectionActivity : AppCompatActivity() {
         faceTrackerProcessor = MultiProcessor.Builder<FvFaceImage>(GraphicFaceTrackerFactory(overlay_group_view, adapter))
                 .build()
 
+        preview_surface_view.addListeners(overlay_group_view)
     }
 
     private var detector: FirebaseVisionDetectorWrapper? = null
 
+    private var cameraSource: CameraSource? = null
+
     override fun onResume() {
         super.onResume()
 
-        if (detector?.isOperational == true && graphicListener != null) {
-            preview_surface_view.start(graphicListener!!)
+        if (detector?.isOperational == true && cameraSource != null) {
+            preview_surface_view.start(cameraSource!!)
         } else {
             detector = FirebaseVisionDetectorWrapper(mlKitFaceDetector!!)
             detector?.setProcessor(faceTrackerProcessor)
 
-            val cameraSource = CameraSource.Builder(this, detector)
+            cameraSource = CameraSource.Builder(this, detector)
                     .setRequestedPreviewSize(640, 480)
                     .setFacing(CameraSource.CAMERA_FACING_BACK)
                     .setRequestedFps(30.0f)
                     .build()
-
-            graphicListener = CameraOverlaySurfaceListener(cameraSource, overlay_group_view)
-            preview_surface_view.start(graphicListener!!)
+            preview_surface_view.start(cameraSource!!)
         }
     }
 
     override fun onPause() {
         super.onPause()
+        preview_surface_view.stop()
+    }
+
+    override fun onStop() {
+        super.onStop()
         preview_surface_view.stop()
     }
 
