@@ -2,7 +2,7 @@ package com.fhc.emotionrec.facedetect.facecamera.ui.faceoverlay
 
 import android.graphics.Canvas
 import android.graphics.Paint
-import com.fhc.emotionrec.facedetect.facecamera.EmotionDetectionActivity.FvFaceImage
+import com.fhc.emotionrec.facedetect.models.FvFaceImage
 
 
 abstract class BaseFaceOverlay(@Volatile var face: FvFaceImage) : Overlay() {

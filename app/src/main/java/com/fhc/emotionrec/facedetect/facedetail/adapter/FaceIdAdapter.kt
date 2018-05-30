@@ -5,19 +5,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.fhc.emotionrec.facedetect.R
-import com.fhc.emotionrec.facedetect.facecamera.EmotionDetectionActivity
+import com.fhc.emotionrec.facedetect.facecamera.GraphicFaceTrackerFactory.FaceTrackerListener
+import com.fhc.emotionrec.facedetect.facecamera.debug
+import com.fhc.emotionrec.facedetect.models.FvFaceImage
 import kotlinx.android.synthetic.main.view_face_id.view.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
-import com.fhc.emotionrec.facedetect.facecamera.EmotionDetectionActivity.FvFaceImage
-import com.fhc.emotionrec.facedetect.facecamera.debug
 
 data class FaceId(val id: Int, val faceImage: FvFaceImage) {
 
 }
 
 class FaceIdAdapter(private val listener: Listener, private val idFace: MutableList<FaceId> = mutableListOf()) : RecyclerView.Adapter<FaceIdViewHolder>(),
-        EmotionDetectionActivity.GraphicFaceTrackerFactory.FaceTrackerListener, FaceIdViewHolder.Listener {
+        FaceTrackerListener, FaceIdViewHolder.Listener {
 
     interface Listener {
         fun onFaceImageClicked(faceImage: FvFaceImage)

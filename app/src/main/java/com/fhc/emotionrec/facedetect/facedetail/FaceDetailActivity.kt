@@ -4,11 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import com.fhc.emotionrec.facedetect.facecamera.EmotionDetectionActivity.FvFaceImage
-import com.fhc.emotionrec.facedetect.facecamera.EmotionDetectionActivity.FvFaceImageParcel
 import kotlinx.android.synthetic.main.activity_face_detail.*
 import android.provider.MediaStore
 import com.fhc.emotionrec.facedetect.R
+import com.fhc.emotionrec.facedetect.models.FvFaceImage
+import com.fhc.emotionrec.facedetect.models.FvFaceImageParcel
 
 
 class FaceDetailActivity : AppCompatActivity() {
