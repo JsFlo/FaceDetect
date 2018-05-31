@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
 
 private const val BASE_URL = "https://886790b4.ngrok.io"
 
-private const val READ_TIMEOUT_SECONDS = 180L
+private const val READ_TIMEOUT_SECONDS = 20L
 
 interface PredictionApi {
     @Multipart

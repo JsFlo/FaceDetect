@@ -44,10 +44,21 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.fhc.emotionrec.facedetect.facedetail.ui.FaceDetailStatsView
-            android:id="@+id/face_details_stats_view"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.fhc.emotionrec.facedetect.facedetail.ui.FaceDetailStatsView
+                android:id="@+id/face_details_stats_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.fhc.emotionrec.facedetect.facedetail.ui.FaceDetailEmotionRec
+                android:id="@+id/face_details_emotion_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
     <android.support.design.widget.FloatingActionButton
