@@ -35,17 +35,18 @@ class FaceDetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_face_detail)
         val faceImageParcel = intent.getParcelableExtra("faceImageParcel") as FvFaceImageParcel
         val bitmap =
-            MediaStore.Images.Media.getBitmap(this.contentResolver, faceImageParcel.imageBitmapUri)
+                MediaStore.Images.Media.getBitmap(this.contentResolver, faceImageParcel.imageBitmapUri)
 
         face_details_stats_view.setFaceImage(
-            FvFaceImage(
-                faceImageParcel.smilingProb,
-                faceImageParcel.leftEyeProb, faceImageParcel.rightEyeProb, bitmap,
-                faceImageParcel.boundingBox, faceImageParcel.color
-            )
+                FvFaceImage(
+                        faceImageParcel.smilingProb,
+                        faceImageParcel.leftEyeProb, faceImageParcel.rightEyeProb, bitmap,
+                        faceImageParcel.boundingBox, faceImageParcel.color
+                )
         )
 
         face_detail_hero_image.setImageBitmap(bitmap)
+
 //        face_details_emotion_view.setPredictionResponse("ajrajkr")
         getPredictionResponse(File(faceImageParcel.imageBitmapUri.path))
 
@@ -53,9 +54,13 @@ class FaceDetailActivity : AppCompatActivity() {
 
     private fun getPredictionResponse(file: File) {
         async {
-            Log.d("test", "about to make call")
+            launch(UI) {
+                face_details_emotion_view.setPredictionResponse("about to make call")
+            }
             val result = predictionServiceApi.uploadImage(file).execute()
-            Log.d("test", "prediction servie after result called")
+            launch(UI) {
+                face_details_emotion_view.setPredictionResponse("after execute")
+            }
             if (result != null && result.isSuccessful) {
                 Log.d("test", "on")
                 launch(UI) {

@@ -4,10 +4,10 @@ import android.content.Context
 import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
 import android.view.View
-import com.fhc.emotionrec.facedetect.facecamera.EmotionDetectionActivity
 import com.fhc.emotionrec.facedetect.R
 import com.fhc.emotionrec.facedetect.models.FvFaceImage
 import kotlinx.android.synthetic.main.view_face_details_stats.view.*
+import java.text.DecimalFormat
 
 class FaceDetailStatsView(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
     init {
@@ -15,8 +15,18 @@ class FaceDetailStatsView(context: Context, attrs: AttributeSet) : ConstraintLay
     }
 
     fun setFaceImage(faceImage: FvFaceImage) {
-        face_detail_smiling_prob.text = face_detail_smiling_prob.text.toString() + faceImage.smilingProb.toString()
-        face_detail_left_eye_prob.text = face_detail_left_eye_prob.text.toString() + faceImage.leftEyeProb.toString()
-        face_detail_right_eye_prob.text = face_detail_right_eye_prob.text.toString() + faceImage.rightEyeProb.toString()
+        with(faceImage) {
+            face_detail_smiling_prob.text = smilingProb.toPrettyFormat()
+            face_detail_left_eye_prob.text = leftEyeProb.toPrettyFormat()
+            face_detail_right_eye_prob.text = rightEyeProb.toPrettyFormat()
+        }
+    }
+
+    private fun Float.toPrettyFormat(): String {
+        return "${decimalFormat.format(this * 100)}%"
+    }
+
+    companion object {
+        private val decimalFormat = DecimalFormat("##")
     }
 }

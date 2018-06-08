@@ -1,39 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/black"
+    android:paddingLeft="2dp"
+    android:paddingTop="4dp"
+    android:paddingRight="2dp"
+    android:paddingBottom="4dp">
 
-    <TextView
-        android:id="@+id/face_detail_smiling_prob"
+    <ImageView
+        android:id="@+id/face_details_face_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="smiling prob: "
-        android:textColor="@color/secondary_text"
-        app:layout_constraintBottom_toTopOf="@id/face_detail_left_eye_prob"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:padding="8dp"
+        android:src="@drawable/ic_tag_faces_black_24dp" />
+
+    <TextView
+        android:id="@+id/face_detail_left_eye_prob_label"
+        style="@style/face_details_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/left_eye_label"
+        app:layout_constraintLeft_toRightOf="@id/face_details_face_image"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/face_detail_left_eye_prob"
+        style="@style/face_details_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="left eye: "
-        android:textColor="@color/secondary_text"
-        app:layout_constraintBottom_toTopOf="@id/face_detail_right_eye_prob"
-        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/face_detail_left_eye_prob_label"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/face_detail_smiling_prob" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/face_detail_right_eye_prob_label"
+        style="@style/face_details_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/right_eye_label"
+        app:layout_constraintLeft_toRightOf="@id/face_details_face_image"
+        app:layout_constraintTop_toBottomOf="@id/face_detail_left_eye_prob_label" />
 
     <TextView
         android:id="@+id/face_detail_right_eye_prob"
+        style="@style/face_details_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="right eye: "
-        android:textColor="@color/secondary_text"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/face_detail_right_eye_prob_label"
+        app:layout_constraintRight_toRightOf="@id/face_detail_left_eye_prob"
         app:layout_constraintTop_toBottomOf="@id/face_detail_left_eye_prob" />
+
+    <TextView
+        android:id="@+id/face_detail_smiling_prob_label"
+        style="@style/face_details_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/smiling_prob_label"
+        app:layout_constraintLeft_toRightOf="@id/face_details_face_image"
+        app:layout_constraintTop_toBottomOf="@id/face_detail_right_eye_prob_label" />
+
+    <TextView
+        android:id="@+id/face_detail_smiling_prob"
+        style="@style/face_details_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toRightOf="@id/face_detail_smiling_prob_label"
+        app:layout_constraintRight_toRightOf="@id/face_detail_right_eye_prob"
+        app:layout_constraintTop_toBottomOf="@id/face_detail_right_eye_prob" />
 </android.support.constraint.ConstraintLayout>

@@ -14,7 +14,7 @@ import retrofit2.http.Part
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-private const val BASE_URL = "https://886790b4.ngrok.io"
+private const val BASE_URL = "https://5efb7123.ngrok.io"
 
 private const val READ_TIMEOUT_SECONDS = 20L
 
