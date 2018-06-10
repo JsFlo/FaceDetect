@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 
 data class FaceId(val uuid: UUID, val faceImage: FvFaceImage)
 
-class FaceIdAdapter(private val listener: Listener, private val idFace: MutableList<FaceId> = mutableListOf()) : RecyclerView.Adapter<FaceIdViewHolder>(),
+class FaceIdAdapter(private val listener: Listener, private val idFaces: MutableList<FaceId> = mutableListOf()) : RecyclerView.Adapter<FaceIdViewHolder>(),
         FaceTrackerListener, FaceIdViewHolder.Listener {
 
     interface Listener {
@@ -46,19 +46,19 @@ class FaceIdAdapter(private val listener: Listener, private val idFace: MutableL
         "onDestroyItem".debug("faceId")
         async {
             delay(DESTROY_DELAY_SECONDS, TimeUnit.SECONDS)
-            idFace.find { it.uuid == uuid }?.let {
+            idFaces.find { it.uuid == uuid }?.let {
                 launch(UI) { removeFaceId(it) }
             }
         }
     }
 
     private fun addFaceId(faceId: FaceId) {
-        idFace.add(faceId)
+        idFaces.add(0, faceId)
         notifyDataSetChanged()
     }
 
     private fun removeFaceId(faceId: FaceId) {
-        idFace.remove(faceId)
+        idFaces.remove(faceId)
         notifyDataSetChanged()
     }
 
@@ -70,17 +70,17 @@ class FaceIdAdapter(private val listener: Listener, private val idFace: MutableL
     }
 
     override fun onBindViewHolder(holder: FaceIdViewHolder, position: Int) {
-        val idFace = idFace[position]
+        val idFace = idFaces[position]
         holder.itemView.face_id_image.setImageBitmap(idFace.faceImage.imageBitmap)
         holder.itemView.face_id_image.borderColor = idFace.faceImage.color
         holder.itemView.face_id_face_detail.setFaceImage(idFace.faceImage)
     }
 
     override fun onFaceClicked(adapterPosition: Int) {
-        listener.onFaceImageClicked(idFace[adapterPosition].faceImage)
+        listener.onFaceImageClicked(idFaces[adapterPosition].faceImage)
     }
 
-    override fun getItemCount() = idFace.size
+    override fun getItemCount() = idFaces.size
 }
 
 class FaceIdViewHolder(itemView: View, val listener: Listener) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
