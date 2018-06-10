@@ -3,6 +3,7 @@ package com.fhc.emotionrec.facedetect.facecamera
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import com.fhc.emotionrec.facedetect.facedetail.FaceDetailActivity
 import com.fhc.emotionrec.facedetect.facecamera.adapter.FaceIdAdapter
@@ -35,7 +36,7 @@ class EmotionDetectionActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_emotion_detection)
 
-        face_id_recycler_view.layoutManager = LinearLayoutManager(this)
+        face_id_recycler_view.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
         val adapter = FaceIdAdapter(object : FaceIdAdapter.Listener {
             override fun onFaceImageClicked(faceImage: FvFaceImage) {
                 startActivity(FaceDetailActivity.newIntent(this@EmotionDetectionActivity, FvFaceImageParcel.create(contentResolver, faceImage)))

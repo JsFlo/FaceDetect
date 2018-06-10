@@ -1,6 +1,7 @@
-package com.fhc.emotionrec.facedetect.facedetail.ui
+package com.fhc.emotionrec.facedetect.ui
 
 import android.content.Context
+import android.opengl.Visibility
 import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
 import android.view.View
@@ -12,6 +13,12 @@ import java.text.DecimalFormat
 class FaceDetailStatsView(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
     init {
         View.inflate(context, R.layout.view_face_details_stats, this)
+
+        val ta = context.obtainStyledAttributes(attrs, R.styleable.FaceDetailStatsView)
+        val showFaceIcon = ta.getBoolean(R.styleable.FaceDetailStatsView_showFaceIcon, SHOW_FACE_ICON_DEFAULT)
+        ta.recycle()
+
+        face_details_face_image.visibility = if (showFaceIcon) View.VISIBLE else View.GONE
     }
 
     fun setFaceImage(faceImage: FvFaceImage) {
@@ -28,5 +35,6 @@ class FaceDetailStatsView(context: Context, attrs: AttributeSet) : ConstraintLay
 
     companion object {
         private val decimalFormat = DecimalFormat("##")
+        private const val SHOW_FACE_ICON_DEFAULT = true
     }
 }

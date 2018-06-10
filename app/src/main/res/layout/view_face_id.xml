@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="16dp"
-    android:layout_marginTop="6dp">
+    android:layout_margin="4dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/face_id_image"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="96dp"
+        android:layout_height="0dp"
+        android:background="@color/black"
         app:civ_border_color="#FF000000"
         app:civ_border_width="6dp"
+        app:layout_constraintBottom_toBottomOf="@id/face_id_face_detail"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/face_id_face_detail"
+        tools:background="@color/black" />
 
-    <TextView
-        android:id="@+id/face_id_text"
+    <com.fhc.emotionrec.facedetect.ui.FaceDetailStatsView
+        android:id="@+id/face_id_face_detail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="6dp"
-        android:text="0"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/face_id_image"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:showFaceIcon="false"
+        tools:background="@color/shamrock" />
 
 
 </android.support.constraint.ConstraintLayout>

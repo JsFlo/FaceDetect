@@ -11,6 +11,7 @@
     <style name="face_details_label">
         <!--<item name="android:minWidth">65dp</item>-->
         <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18dp</item>
         <item name="android:textColor">@color/secondary_text</item>
     </style>
 
