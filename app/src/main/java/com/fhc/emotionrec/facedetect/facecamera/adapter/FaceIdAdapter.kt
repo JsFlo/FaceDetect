@@ -10,11 +10,13 @@ import com.fhc.emotionrec.facedetect.facecamera.debug
 import com.fhc.emotionrec.facedetect.models.FvFaceImage
 import kotlinx.android.synthetic.main.view_face_id.view.*
 import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
+import java.util.*
+import java.util.concurrent.TimeUnit
 
-data class FaceId(val id: Int, val faceImage: FvFaceImage) {
-
-}
+data class FaceId(val uuid: UUID, val faceImage: FvFaceImage)
 
 class FaceIdAdapter(private val listener: Listener, private val idFace: MutableList<FaceId> = mutableListOf()) : RecyclerView.Adapter<FaceIdViewHolder>(),
         FaceTrackerListener, FaceIdViewHolder.Listener {
@@ -23,29 +25,41 @@ class FaceIdAdapter(private val listener: Listener, private val idFace: MutableL
         fun onFaceImageClicked(faceImage: FvFaceImage)
     }
 
-    override fun newItem(id: Int, face: FvFaceImage) {
-        "new Item".debug("faceId")
-        idFace.add(FaceId(id, face))
-        launch(UI) {
-            notifyDataSetChanged()
-        }
+    companion object {
+        private const val DESTROY_DELAY_SECONDS = 3L
     }
 
-    override fun onUpdateItem(id: Int, face: FvFaceImage) {
+    override fun newItem(uuid: UUID, face: FvFaceImage) {
+        "new Item".debug("faceId")
+        launch(UI) { addFaceId(FaceId(uuid, face)) }
+    }
+
+    override fun onUpdateItem(uuid: UUID, face: FvFaceImage) {
 //        idLi
     }
 
-    override fun onMissingItem(id: Int) {
+    override fun onMissingItem(uuid: UUID) {
 
     }
 
-    override fun onDestroyItem(id: Int) {
+    override fun onDestroyItem(uuid: UUID) {
         "onDestroyItem".debug("faceId")
-        idFace.remove(idFace.find { it.id == id })
-
-        launch(UI) {
-            notifyDataSetChanged()
+        async {
+            delay(DESTROY_DELAY_SECONDS, TimeUnit.SECONDS)
+            idFace.find { it.uuid == uuid }?.let {
+                launch(UI) { removeFaceId(it) }
+            }
         }
+    }
+
+    private fun addFaceId(faceId: FaceId) {
+        idFace.add(faceId)
+        notifyDataSetChanged()
+    }
+
+    private fun removeFaceId(faceId: FaceId) {
+        idFace.remove(faceId)
+        notifyDataSetChanged()
     }
 
 

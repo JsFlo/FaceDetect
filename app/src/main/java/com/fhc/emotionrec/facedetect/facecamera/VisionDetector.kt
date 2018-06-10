@@ -15,6 +15,7 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector
 import kotlinx.coroutines.experimental.runBlocking
+import java.util.*
 import kotlin.coroutines.experimental.suspendCoroutine
 
 
@@ -22,10 +23,10 @@ class GraphicFaceTrackerFactory(private val overlayGroupView: OverlayGroupView,
                                 private val faceTrackerListener: FaceTrackerListener) : MultiProcessor.Factory<FvFaceImage> {
 
     interface FaceTrackerListener {
-        fun newItem(id: Int, faceImage: FvFaceImage)
-        fun onUpdateItem(id: Int, faceImage: FvFaceImage)
-        fun onMissingItem(id: Int)
-        fun onDestroyItem(id: Int)
+        fun newItem(uuid: UUID, faceImage: FvFaceImage)
+        fun onUpdateItem(uuid: UUID, faceImage: FvFaceImage)
+        fun onMissingItem(uuid: UUID)
+        fun onDestroyItem(uuid: UUID)
     }
 
     override fun create(faceImage: FvFaceImage?): Tracker<FvFaceImage> {
@@ -41,16 +42,15 @@ class FirebaseVisionFaceTracker(
         private var faceTrackerListener: GraphicFaceTrackerFactory.FaceTrackerListener?
 ) :
         Tracker<FvFaceImage>() {
-    var id: Int = 0
+    var uuid: UUID = UUID.randomUUID()
 
 
     override fun onNewItem(id: Int, faceImage: FvFaceImage?) {
-        this.id = id
         "new item".debug("FACE_TRACKER")
         faceImage?.let {
             overlayGroupView.addOverlay(graphicFaceOverlay)
             graphicFaceOverlay.updateFace(faceImage)
-            faceTrackerListener?.newItem(id, faceImage)
+            faceTrackerListener?.newItem(uuid, faceImage)
         }
     }
 
@@ -61,20 +61,20 @@ class FirebaseVisionFaceTracker(
         "onUdpate".debug("FACE_TRACKER")
         faceImage?.let {
             graphicFaceOverlay.updateFace(faceImage)
-            faceTrackerListener?.onUpdateItem(id, faceImage)
+            faceTrackerListener?.onUpdateItem(uuid, faceImage)
         }
     }
 
     override fun onMissing(detectionResult: Detector.Detections<FvFaceImage>?) {
         "onMIssing".debug("FACE_TRACKER")
         overlayGroupView.removeOverlay(graphicFaceOverlay)
-        faceTrackerListener?.onMissingItem(id)
+        faceTrackerListener?.onMissingItem(uuid)
     }
 
     override fun onDone() {
         "onDone".debug("FACE_TRACKER")
         overlayGroupView.removeOverlay(graphicFaceOverlay)
-        faceTrackerListener?.onDestroyItem(id)
+        faceTrackerListener?.onDestroyItem(uuid)
         faceTrackerListener = null
     }
 }

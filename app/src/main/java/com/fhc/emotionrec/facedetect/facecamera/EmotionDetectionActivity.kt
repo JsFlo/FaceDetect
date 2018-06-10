@@ -52,6 +52,7 @@ class EmotionDetectionActivity : AppCompatActivity() {
 
         mlKitFaceDetector = FirebaseVision.getInstance()
                 .getVisionFaceDetector(options)
+
         faceTrackerProcessor = MultiProcessor.Builder<FvFaceImage>(GraphicFaceTrackerFactory(overlay_group_view, adapter))
                 .build()
 
