@@ -7,6 +7,7 @@ import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_face_detail.*
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
 import com.fhc.emotionrec.facedetect.R
 import com.fhc.emotionrec.facedetect.facedetail.network.predictionServiceApi
 import com.fhc.emotionrec.facedetect.facedetail.network.uploadImage
@@ -53,24 +54,17 @@ class FaceDetailActivity : AppCompatActivity() {
     }
 
     private fun getPredictionResponse(file: File) {
+        face_details_emotion_view.visibility = View.GONE
         async {
-            launch(UI) {
-                face_details_emotion_view.setPredictionResponse("about to make call")
-            }
             val result = predictionServiceApi.uploadImage(file).execute()
-            launch(UI) {
-                face_details_emotion_view.setPredictionResponse("after execute")
-            }
             if (result != null && result.isSuccessful) {
                 Log.d("test", "on")
                 launch(UI) {
-                    face_details_emotion_view.setPredictionResponse(result.body()!!.toString())
+                    face_details_emotion_view.visibility = View.VISIBLE
+                    face_details_emotion_view.setPredictionResponse(result.body()!!)
                 }
             } else {
                 Log.d("test", "else")
-                launch(UI) {
-                    face_details_emotion_view.setPredictionResponse("Err")
-                }
             }
         }
     }

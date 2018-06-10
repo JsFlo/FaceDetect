@@ -1,4 +1,4 @@
-package com.fhc.emotionrec.facedetect.facedetail.adapter
+package com.fhc.emotionrec.facedetect.facecamera.adapter
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater

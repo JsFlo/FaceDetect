@@ -2,13 +2,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark">
 
     <ImageView
         android:id="@+id/face_detail_hero_image"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/black"
         android:scaleType="fitCenter"
         android:src="@drawable/common_full_open_on_phone"
         app:layout_constraintBottom_toTopOf="@id/face_details_stats_view"
@@ -20,15 +20,17 @@
         android:id="@+id/face_details_stats_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/face_details_emotion_view"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toLeftOf="@id/face_details_emotion_view"
+        app:layout_constraintTop_toBottomOf="@id/face_detail_hero_image" />
 
     <com.fhc.emotionrec.facedetect.facedetail.ui.FaceDetailEmotionRec
         android:id="@+id/face_details_emotion_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintLeft_toRightOf="@id/face_details_stats_view"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/face_details_stats_view" />
 </android.support.constraint.ConstraintLayout>
