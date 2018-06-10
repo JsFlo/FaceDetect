@@ -110,6 +110,7 @@ class FirebaseVisionDetectorWrapper(private val firebaseVisionFaceDetector: Fire
                 firebaseVisionFaceDetector.detectImageSync(fvImage)
             }
 
+            // TODO: color out of here
             mCurrentColorIndex = (mCurrentColorIndex + 1) % COLOR_CHOICES.size
             val selectedColor: Int = COLOR_CHOICES[mCurrentColorIndex]
             val sparseArray = SparseArray<FvFaceImage>()

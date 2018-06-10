@@ -81,7 +81,6 @@ class FaceIdAdapter(private val listener: Listener, private val idFaces: Mutable
         notifyDataSetChanged()
     }
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FaceIdViewHolder {
         val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.view_face_id, parent, false)
