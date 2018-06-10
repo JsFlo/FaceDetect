@@ -15,8 +15,19 @@ import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
-data class FaceId(val uuid: UUID, val faceImage: FvFaceImage)
+class FaceId(val uuid: UUID, faceImage: FvFaceImage) {
+    val faceImages: MutableList<FvFaceImage> = ArrayList()
+
+    init {
+        faceImages.add(faceImage)
+    }
+
+    fun addFaceImage(newFaceImage: FvFaceImage) {
+        faceImages.add(0, newFaceImage)
+    }
+}
 
 class FaceIdAdapter(private val listener: Listener, private val idFaces: MutableList<FaceId> = mutableListOf()) : RecyclerView.Adapter<FaceIdViewHolder>(),
         FaceTrackerListener, FaceIdViewHolder.Listener {
@@ -35,7 +46,9 @@ class FaceIdAdapter(private val listener: Listener, private val idFaces: Mutable
     }
 
     override fun onUpdateItem(uuid: UUID, face: FvFaceImage) {
-//        idLi
+        idFaces.find { it.uuid == uuid }?.let { idFace ->
+            launch(UI) { updateFaceId(idFace, face) }
+        }
     }
 
     override fun onMissingItem(uuid: UUID) {
@@ -57,6 +70,12 @@ class FaceIdAdapter(private val listener: Listener, private val idFaces: Mutable
         notifyDataSetChanged()
     }
 
+    private fun updateFaceId(faceId: FaceId, newFaceImage: FvFaceImage) {
+        val index = idFaces.indexOf(faceId)
+        faceId.addFaceImage(newFaceImage)
+        notifyItemChanged(index)
+    }
+
     private fun removeFaceId(faceId: FaceId) {
         idFaces.remove(faceId)
         notifyDataSetChanged()
@@ -71,13 +90,16 @@ class FaceIdAdapter(private val listener: Listener, private val idFaces: Mutable
 
     override fun onBindViewHolder(holder: FaceIdViewHolder, position: Int) {
         val idFace = idFaces[position]
-        holder.itemView.face_id_image.setImageBitmap(idFace.faceImage.imageBitmap)
-        holder.itemView.face_id_image.borderColor = idFace.faceImage.color
-        holder.itemView.face_id_face_detail.setFaceImage(idFace.faceImage)
+        idFace.faceImages[0].let { faceImage ->
+            holder.itemView.face_id_image.setImageBitmap(faceImage.imageBitmap)
+            holder.itemView.face_id_image.borderColor = faceImage.color
+            holder.itemView.face_id_face_detail.setFaceImage(faceImage)
+        }
     }
 
     override fun onFaceClicked(adapterPosition: Int) {
-        listener.onFaceImageClicked(idFaces[adapterPosition].faceImage)
+        // TODO: Send multiple
+        listener.onFaceImageClicked(idFaces[adapterPosition].faceImages[0])
     }
 
     override fun getItemCount() = idFaces.size
