@@ -20,8 +20,8 @@ import kotlin.coroutines.experimental.suspendCoroutine
 
 
 class GraphicFaceTrackerFactory(
-    private val overlayGroupView: OverlayGroupView,
-    private val faceTrackerListener: FaceTrackerListener
+        private val overlayGroupView: OverlayGroupView,
+        private val faceTrackerListener: FaceTrackerListener
 ) : MultiProcessor.Factory<FvFaceImage> {
 
     interface FaceTrackerListener {
@@ -36,30 +36,30 @@ class GraphicFaceTrackerFactory(
         val selectedColor: Int = COLOR_CHOICES[mCurrentColorIndex]
 
         return FirebaseVisionFaceTracker(
-            GraphicFaceOverlay(faceImage!!, selectedColor),
-            overlayGroupView,
-            faceTrackerListener
+                GraphicFaceOverlay(faceImage!!, selectedColor),
+                overlayGroupView,
+                faceTrackerListener
         )
     }
 
     companion object {
         private val COLOR_CHOICES = intArrayOf(
-            Color.BLUE,
-            Color.CYAN,
-            Color.GREEN,
-            Color.MAGENTA,
-            Color.RED,
-            Color.WHITE,
-            Color.YELLOW
+                Color.BLUE,
+                Color.CYAN,
+                Color.GREEN,
+                Color.MAGENTA,
+                Color.RED,
+                Color.WHITE,
+                Color.YELLOW
         )
         private var mCurrentColorIndex = 0
     }
 }
 
 class FirebaseVisionFaceTracker(
-    private val graphicFaceOverlay: GraphicFaceOverlay,
-    private val overlayGroupView: OverlayGroupView,
-    private var faceTrackerListener: GraphicFaceTrackerFactory.FaceTrackerListener?
+        private val graphicFaceOverlay: GraphicFaceOverlay,
+        private val overlayGroupView: OverlayGroupView,
+        private var faceTrackerListener: GraphicFaceTrackerFactory.FaceTrackerListener?
 ) : Tracker<FvFaceImage>() {
     var uuid: UUID = UUID.randomUUID()
 
@@ -74,8 +74,8 @@ class FirebaseVisionFaceTracker(
     }
 
     override fun onUpdate(
-        detectionResult: Detector.Detections<FvFaceImage>?,
-        faceImage: FvFaceImage?
+            detectionResult: Detector.Detections<FvFaceImage>?,
+            faceImage: FvFaceImage?
     ) {
         "onUdpate".debug("FACE_TRACKER")
         faceImage?.let {
@@ -99,7 +99,7 @@ class FirebaseVisionFaceTracker(
 }
 
 class FirebaseVisionDetectorWrapper(private val firebaseVisionFaceDetector: FirebaseVisionFaceDetector) :
-    Detector<FvFaceImage>() {
+        Detector<FvFaceImage>() {
 
     private var releaseCalled = false
 
@@ -112,47 +112,43 @@ class FirebaseVisionDetectorWrapper(private val firebaseVisionFaceDetector: Fire
         super.release()
     }
 
-    // TODO: Vision and bitmap
     override fun detect(frame: Frame?): SparseArray<FvFaceImage> {
-        Log.d("test", "detect")
-        if (frame != null) {
-            Log.d("test", "frame not null")
-            val fvImage =
-                FirebaseVisionImage.fromByteBuffer(
-                    frame.grayscaleImageData,
-                    frame.metadata.toFirebaseVisionMetaData()
-                )
+        return if (frame != null) {
+            val fvImage = frame.toFirebaseVisionImage()
+            val result = runBlocking { firebaseVisionFaceDetector.detectImageSync(fvImage) }
 
-            val result = runBlocking {
-                firebaseVisionFaceDetector.detectImageSync(fvImage)
-            }
-
-//            // TODO: color out of here
             val sparseArray = SparseArray<FvFaceImage>()
-            result?.forEachIndexed { index, fvFace ->
-                sparseArray.put(index, FvFaceImage.create(fvFace, fvImage))
-            }
-            return sparseArray
+            result?.map { fvFace -> FvFaceImage.create(fvFace, fvImage) }
+                    ?.forEachIndexed { index, fvFaceImage ->
+                        sparseArray.put(index, fvFaceImage)
+                    }
+            sparseArray
         } else {
-            return SparseArray()
+            SparseArray()
         }
     }
 }
 
-fun Frame.Metadata.toFirebaseVisionMetaData(): FirebaseVisionImageMetadata {
-    return FirebaseVisionImageMetadata.Builder()
-        .setWidth(width)
-        .setHeight(height)
-//                    .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
-        .setFormat(format)
-        .setRotation(rotation)
-        .build()
+private fun Frame.toFirebaseVisionImage(): FirebaseVisionImage {
+    return FirebaseVisionImage.fromByteBuffer(
+            grayscaleImageData,
+            metadata.toFirebaseVisionMetaData()
+    )
 }
 
-suspend fun FirebaseVisionFaceDetector.detectImageSync(firebaseVisionImage: FirebaseVisionImage): List<FirebaseVisionFace>? {
+private fun Frame.Metadata.toFirebaseVisionMetaData(): FirebaseVisionImageMetadata {
+    return FirebaseVisionImageMetadata.Builder()
+            .setWidth(width)
+            .setHeight(height)
+            .setFormat(format)
+            .setRotation(rotation)
+            .build()
+}
+
+private suspend fun FirebaseVisionFaceDetector.detectImageSync(firebaseVisionImage: FirebaseVisionImage): List<FirebaseVisionFace>? {
     return suspendCoroutine<List<FirebaseVisionFace>> { continuation ->
         detectInImage(firebaseVisionImage)
-            .addOnSuccessListener { continuation.resume(it) }
-            .addOnFailureListener { continuation.resumeWithException(it) }
+                .addOnSuccessListener { continuation.resume(it) }
+                .addOnFailureListener { continuation.resumeWithException(it) }
     }
 }
