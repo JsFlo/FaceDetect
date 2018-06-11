@@ -16,6 +16,11 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/face_detail_face_id_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <com.fhc.emotionrec.facedetect.ui.FaceDetailStatsView
         android:id="@+id/face_details_stats_view"
         android:layout_width="wrap_content"

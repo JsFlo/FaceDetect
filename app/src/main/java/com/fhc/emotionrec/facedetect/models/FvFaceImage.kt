@@ -32,7 +32,7 @@ data class FvFaceImageParcel(
     val smilingProb: Float,
     val leftEyeProb: Float,
     val rightEyeProb: Float,
-    val imageBitmapUri: Uri,
+    val imageBitmapUri: String,
     val boundingBox: Rect
 ) : Parcelable {
     companion object {
@@ -41,7 +41,7 @@ data class FvFaceImageParcel(
 
             val file = File(path, "bitmap_${Date()}.png")
             file.outputStream().use {
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 85, it)
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
             }
             MediaStore.Images.Media.insertImage(
                 contentResolver,
@@ -60,8 +60,8 @@ data class FvFaceImageParcel(
                 return FvFaceImageParcel(
                     smilingProb,
                     leftEyeProb,
-                    rightEyeProb,
-                    imageToUri(contentResolver, imageBitmap),
+                    rightEyeProb,"",
+//                    imageToUri(contentResolver, imageBitmap),
                     boundingBox
                 )
             }

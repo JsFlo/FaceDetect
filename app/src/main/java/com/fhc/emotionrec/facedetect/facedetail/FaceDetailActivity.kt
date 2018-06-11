@@ -5,15 +5,14 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_face_detail.*
-import android.provider.MediaStore
+import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
 import com.fhc.emotionrec.facedetect.R
+import com.fhc.emotionrec.facedetect.facedetail.adapter.FaceImageAdapter
 import com.fhc.emotionrec.facedetect.facedetail.network.predictionServiceApi
 import com.fhc.emotionrec.facedetect.facedetail.network.uploadImage
 import com.fhc.emotionrec.facedetect.models.FaceIdParcel
-import com.fhc.emotionrec.facedetect.models.FvFaceImage
-import com.fhc.emotionrec.facedetect.models.FvFaceImageParcel
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
@@ -37,8 +36,8 @@ class FaceDetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_face_detail)
         val faceIdParcel = intent.getParcelableExtra("faceIdParcel") as FaceIdParcel
 
-        val bitmap =
-                MediaStore.Images.Media.getBitmap(this.contentResolver, faceIdParcel.faceImages[0].imageBitmapUri)
+//        val bitmap =
+//                MediaStore.Images.Media.getBitmap(this.contentResolver, faceIdParcel.faceImages[0].imageBitmapUri)
 
 //        face_details_stats_view.setFaceImage(
 //                FvFaceImage(
@@ -48,7 +47,10 @@ class FaceDetailActivity : AppCompatActivity() {
 //                )
 //        )
 
-        face_detail_hero_image.setImageBitmap(bitmap)
+//        face_detail_hero_image.setImageBitmap(bitmap)
+        face_detail_face_id_recycler_view.adapter = FaceImageAdapter(faceIdParcel.faceImages)
+        face_detail_face_id_recycler_view.layoutManager = LinearLayoutManager(this)
+
 
 //        face_details_emotion_view.setPredictionResponse("ajrajkr")
 //        getPredictionResponse(File(faceImageParcel.imageBitmapUri.path))

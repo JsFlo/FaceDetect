@@ -11,7 +11,6 @@ import com.fhc.emotionrec.facedetect.R
 import com.fhc.emotionrec.facedetect.facecamera.adapter.FaceId
 import com.fhc.emotionrec.facedetect.models.FaceIdParcel
 import com.fhc.emotionrec.facedetect.models.FvFaceImage
-import com.fhc.emotionrec.facedetect.models.FvFaceImageParcel
 import com.google.android.gms.vision.*
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector
