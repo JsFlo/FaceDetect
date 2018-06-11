@@ -24,13 +24,12 @@ abstract class BaseFaceOverlay(@Volatile var face: FvFaceImage) : Overlay() {
     abstract fun onDraw(canvas: Canvas, face: FvFaceImage, overlayTransformations: OverlayTransformations)
 }
 
-class GraphicFaceOverlay(faceImage: FvFaceImage) : BaseFaceOverlay(faceImage) {
+class GraphicFaceOverlay(faceImage: FvFaceImage, val selectedColor: Int) : BaseFaceOverlay(faceImage) {
 
     private val facePositionPaint = Paint()
     private val boxPaint = Paint()
 
     init {
-        val selectedColor = faceImage.color
         facePositionPaint.color = selectedColor
 
         boxPaint.color = selectedColor

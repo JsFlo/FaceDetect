@@ -17,7 +17,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
-class FaceId(val uuid: UUID, faceImage: FvFaceImage) {
+class FaceId(val uuid: UUID, val color: Int, faceImage: FvFaceImage) {
     val faceImages: MutableList<FvFaceImage> = ArrayList()
 
     init {
@@ -29,20 +29,23 @@ class FaceId(val uuid: UUID, faceImage: FvFaceImage) {
     }
 }
 
-class FaceIdAdapter(private val listener: Listener, private val idFaces: MutableList<FaceId> = mutableListOf()) : RecyclerView.Adapter<FaceIdViewHolder>(),
-        FaceTrackerListener, FaceIdViewHolder.Listener {
+class FaceIdAdapter(
+    private val listener: Listener,
+    private val idFaces: MutableList<FaceId> = mutableListOf()
+) : RecyclerView.Adapter<FaceIdViewHolder>(),
+    FaceTrackerListener, FaceIdViewHolder.Listener {
 
     interface Listener {
-        fun onFaceImageClicked(faceImage: FvFaceImage)
+        fun onFaceImageClicked(faceId: FaceId)
     }
 
     companion object {
         private const val DESTROY_DELAY_SECONDS = 3L
     }
 
-    override fun newItem(uuid: UUID, face: FvFaceImage) {
+    override fun newItem(uuid: UUID, face: FvFaceImage, color: Int) {
         "new Item".debug("faceId")
-        launch(UI) { addFaceId(FaceId(uuid, face)) }
+        launch(UI) { addFaceId(FaceId(uuid, color, face)) }
     }
 
     override fun onUpdateItem(uuid: UUID, face: FvFaceImage) {
@@ -83,7 +86,7 @@ class FaceIdAdapter(private val listener: Listener, private val idFaces: Mutable
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FaceIdViewHolder {
         val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.view_face_id, parent, false)
+            .inflate(R.layout.view_face_id, parent, false)
         return FaceIdViewHolder(view, this)
     }
 
@@ -91,20 +94,20 @@ class FaceIdAdapter(private val listener: Listener, private val idFaces: Mutable
         val idFace = idFaces[position]
         idFace.faceImages[0].let { faceImage ->
             holder.itemView.face_id_image.setImageBitmap(faceImage.imageBitmap)
-            holder.itemView.face_id_image.borderColor = faceImage.color
+            holder.itemView.face_id_image.borderColor = idFace.color
             holder.itemView.face_id_face_detail.setFaceImage(faceImage)
         }
     }
 
     override fun onFaceClicked(adapterPosition: Int) {
-        // TODO: Send multiple
-        listener.onFaceImageClicked(idFaces[adapterPosition].faceImages[0])
+        listener.onFaceImageClicked(idFaces[adapterPosition])
     }
 
     override fun getItemCount() = idFaces.size
 }
 
-class FaceIdViewHolder(itemView: View, val listener: Listener) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+class FaceIdViewHolder(itemView: View, val listener: Listener) : RecyclerView.ViewHolder(itemView),
+    View.OnClickListener {
     interface Listener {
         fun onFaceClicked(adapterPosition: Int)
     }

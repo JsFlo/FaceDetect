@@ -8,6 +8,8 @@ import android.util.Log
 import com.fhc.emotionrec.facedetect.facedetail.FaceDetailActivity
 import com.fhc.emotionrec.facedetect.facecamera.adapter.FaceIdAdapter
 import com.fhc.emotionrec.facedetect.R
+import com.fhc.emotionrec.facedetect.facecamera.adapter.FaceId
+import com.fhc.emotionrec.facedetect.models.FaceIdParcel
 import com.fhc.emotionrec.facedetect.models.FvFaceImage
 import com.fhc.emotionrec.facedetect.models.FvFaceImageParcel
 import com.google.android.gms.vision.*
@@ -23,10 +25,6 @@ fun String?.debug(tag: String = "test") {
 }
 
 class EmotionDetectionActivity : AppCompatActivity() {
-    companion object {
-        private const val REQUEST_IMAGE_CAPTURE = 1
-        private const val REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE = 2
-    }
 
     private var faceTrackerProcessor: MultiProcessor<FvFaceImage>? = null
 
@@ -38,8 +36,8 @@ class EmotionDetectionActivity : AppCompatActivity() {
 
         face_id_recycler_view.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
         val adapter = FaceIdAdapter(object : FaceIdAdapter.Listener {
-            override fun onFaceImageClicked(faceImage: FvFaceImage) {
-                startActivity(FaceDetailActivity.newIntent(this@EmotionDetectionActivity, FvFaceImageParcel.create(contentResolver, faceImage)))
+            override fun onFaceImageClicked(faceId: FaceId) {
+                startActivity(FaceDetailActivity.newIntent(this@EmotionDetectionActivity, FaceIdParcel.create(faceId, contentResolver)))
             }
 
         })

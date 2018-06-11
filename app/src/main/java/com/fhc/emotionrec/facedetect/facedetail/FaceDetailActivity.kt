@@ -11,6 +11,7 @@ import android.view.View
 import com.fhc.emotionrec.facedetect.R
 import com.fhc.emotionrec.facedetect.facedetail.network.predictionServiceApi
 import com.fhc.emotionrec.facedetect.facedetail.network.uploadImage
+import com.fhc.emotionrec.facedetect.models.FaceIdParcel
 import com.fhc.emotionrec.facedetect.models.FvFaceImage
 import com.fhc.emotionrec.facedetect.models.FvFaceImageParcel
 import kotlinx.coroutines.experimental.android.UI
@@ -22,10 +23,10 @@ import java.io.File
 class FaceDetailActivity : AppCompatActivity() {
 
     companion object {
-        fun newIntent(context: Context, faceImageParcel: FvFaceImageParcel): Intent {
+        fun newIntent(context: Context, faceIdParcel: FaceIdParcel): Intent {
 
             val intent = Intent(context, FaceDetailActivity::class.java)
-            intent.putExtra("faceImageParcel", faceImageParcel)
+            intent.putExtra("faceIdParcel", faceIdParcel)
             return intent
         }
     }
@@ -34,22 +35,23 @@ class FaceDetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_face_detail)
-        val faceImageParcel = intent.getParcelableExtra("faceImageParcel") as FvFaceImageParcel
-        val bitmap =
-                MediaStore.Images.Media.getBitmap(this.contentResolver, faceImageParcel.imageBitmapUri)
+        val faceIdParcel = intent.getParcelableExtra("faceIdParcel") as FaceIdParcel
 
-        face_details_stats_view.setFaceImage(
-                FvFaceImage(
-                        faceImageParcel.smilingProb,
-                        faceImageParcel.leftEyeProb, faceImageParcel.rightEyeProb, bitmap,
-                        faceImageParcel.boundingBox, faceImageParcel.color
-                )
-        )
+        val bitmap =
+                MediaStore.Images.Media.getBitmap(this.contentResolver, faceIdParcel.faceImages[0].imageBitmapUri)
+
+//        face_details_stats_view.setFaceImage(
+//                FvFaceImage(
+//                    faceIdParcel.smilingProb,
+//                        faceImageParcel.leftEyeProb, faceImageParcel.rightEyeProb, bitmap,
+//                        faceImageParcel.boundingBox, faceImageParcel.color
+//                )
+//        )
 
         face_detail_hero_image.setImageBitmap(bitmap)
 
 //        face_details_emotion_view.setPredictionResponse("ajrajkr")
-        getPredictionResponse(File(faceImageParcel.imageBitmapUri.path))
+//        getPredictionResponse(File(faceImageParcel.imageBitmapUri.path))
 
     }
 

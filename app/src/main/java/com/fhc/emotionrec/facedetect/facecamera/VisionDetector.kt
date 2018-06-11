@@ -19,29 +19,48 @@ import java.util.*
 import kotlin.coroutines.experimental.suspendCoroutine
 
 
-class GraphicFaceTrackerFactory(private val overlayGroupView: OverlayGroupView,
-                                private val faceTrackerListener: FaceTrackerListener) : MultiProcessor.Factory<FvFaceImage> {
+class GraphicFaceTrackerFactory(
+    private val overlayGroupView: OverlayGroupView,
+    private val faceTrackerListener: FaceTrackerListener
+) : MultiProcessor.Factory<FvFaceImage> {
 
     interface FaceTrackerListener {
-        fun newItem(uuid: UUID, faceImage: FvFaceImage)
+        fun newItem(uuid: UUID, faceImage: FvFaceImage, color: Int)
         fun onUpdateItem(uuid: UUID, faceImage: FvFaceImage)
         fun onMissingItem(uuid: UUID)
         fun onDestroyItem(uuid: UUID)
     }
 
     override fun create(faceImage: FvFaceImage?): Tracker<FvFaceImage> {
+        mCurrentColorIndex = (mCurrentColorIndex + 1) % COLOR_CHOICES.size
+        val selectedColor: Int = COLOR_CHOICES[mCurrentColorIndex]
+
         return FirebaseVisionFaceTracker(
-                GraphicFaceOverlay(faceImage!!),
-                overlayGroupView, faceTrackerListener)
+            GraphicFaceOverlay(faceImage!!, selectedColor),
+            overlayGroupView,
+            faceTrackerListener
+        )
+    }
+
+    companion object {
+        private val COLOR_CHOICES = intArrayOf(
+            Color.BLUE,
+            Color.CYAN,
+            Color.GREEN,
+            Color.MAGENTA,
+            Color.RED,
+            Color.WHITE,
+            Color.YELLOW
+        )
+        private var mCurrentColorIndex = 0
     }
 }
 
 class FirebaseVisionFaceTracker(
-        private val graphicFaceOverlay: GraphicFaceOverlay,
-        private val overlayGroupView: OverlayGroupView,
-        private var faceTrackerListener: GraphicFaceTrackerFactory.FaceTrackerListener?
-) :
-        Tracker<FvFaceImage>() {
+    private val graphicFaceOverlay: GraphicFaceOverlay,
+    private val overlayGroupView: OverlayGroupView,
+    private var faceTrackerListener: GraphicFaceTrackerFactory.FaceTrackerListener?
+) : Tracker<FvFaceImage>() {
     var uuid: UUID = UUID.randomUUID()
 
 
@@ -50,13 +69,13 @@ class FirebaseVisionFaceTracker(
         faceImage?.let {
             overlayGroupView.addOverlay(graphicFaceOverlay)
             graphicFaceOverlay.updateFace(faceImage)
-            faceTrackerListener?.newItem(uuid, faceImage)
+            faceTrackerListener?.newItem(uuid, faceImage, graphicFaceOverlay.selectedColor)
         }
     }
 
     override fun onUpdate(
-            detectionResult: Detector.Detections<FvFaceImage>?,
-            faceImage: FvFaceImage?
+        detectionResult: Detector.Detections<FvFaceImage>?,
+        faceImage: FvFaceImage?
     ) {
         "onUdpate".debug("FACE_TRACKER")
         faceImage?.let {
@@ -80,14 +99,9 @@ class FirebaseVisionFaceTracker(
 }
 
 class FirebaseVisionDetectorWrapper(private val firebaseVisionFaceDetector: FirebaseVisionFaceDetector) :
-        Detector<FvFaceImage>() {
+    Detector<FvFaceImage>() {
 
     private var releaseCalled = false
-
-    companion object {
-        private val COLOR_CHOICES = intArrayOf(Color.BLUE, Color.CYAN, Color.GREEN, Color.MAGENTA, Color.RED, Color.WHITE, Color.YELLOW)
-        private var mCurrentColorIndex = 0
-    }
 
     override fun isOperational(): Boolean {
         return !releaseCalled
@@ -104,19 +118,19 @@ class FirebaseVisionDetectorWrapper(private val firebaseVisionFaceDetector: Fire
         if (frame != null) {
             Log.d("test", "frame not null")
             val fvImage =
-                    FirebaseVisionImage.fromByteBuffer(frame.grayscaleImageData, frame.metadata.toFirebaseVisionMetaData())
+                FirebaseVisionImage.fromByteBuffer(
+                    frame.grayscaleImageData,
+                    frame.metadata.toFirebaseVisionMetaData()
+                )
 
             val result = runBlocking {
                 firebaseVisionFaceDetector.detectImageSync(fvImage)
             }
 
-            // TODO: color out of here
-            mCurrentColorIndex = (mCurrentColorIndex + 1) % COLOR_CHOICES.size
-            val selectedColor: Int = COLOR_CHOICES[mCurrentColorIndex]
+//            // TODO: color out of here
             val sparseArray = SparseArray<FvFaceImage>()
             result?.forEachIndexed { index, fvFace ->
-                Log.d("test", "fvImage!")
-                sparseArray.put(index, FvFaceImage.create(fvFace, fvImage, selectedColor))
+                sparseArray.put(index, FvFaceImage.create(fvFace, fvImage))
             }
             return sparseArray
         } else {
@@ -127,18 +141,18 @@ class FirebaseVisionDetectorWrapper(private val firebaseVisionFaceDetector: Fire
 
 fun Frame.Metadata.toFirebaseVisionMetaData(): FirebaseVisionImageMetadata {
     return FirebaseVisionImageMetadata.Builder()
-            .setWidth(width)
-            .setHeight(height)
+        .setWidth(width)
+        .setHeight(height)
 //                    .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
-            .setFormat(format)
-            .setRotation(rotation)
-            .build()
+        .setFormat(format)
+        .setRotation(rotation)
+        .build()
 }
 
 suspend fun FirebaseVisionFaceDetector.detectImageSync(firebaseVisionImage: FirebaseVisionImage): List<FirebaseVisionFace>? {
     return suspendCoroutine<List<FirebaseVisionFace>> { continuation ->
         detectInImage(firebaseVisionImage)
-                .addOnSuccessListener { continuation.resume(it) }
-                .addOnFailureListener { continuation.resumeWithException(it) }
+            .addOnSuccessListener { continuation.resume(it) }
+            .addOnFailureListener { continuation.resumeWithException(it) }
     }
 }
