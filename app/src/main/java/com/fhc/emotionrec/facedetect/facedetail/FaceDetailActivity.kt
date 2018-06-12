@@ -13,7 +13,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
 import com.fhc.emotionrec.facedetect.R
-import com.fhc.emotionrec.facedetect.facecamera.ColorController
 import com.fhc.emotionrec.facedetect.facedetail.adapter.FaceImageAdapter
 import com.fhc.emotionrec.facedetect.facedetail.network.predictionServiceApi
 import com.fhc.emotionrec.facedetect.facedetail.network.uploadImage
@@ -62,12 +61,12 @@ class FaceDetailActivity : AppCompatActivity() {
     }
 
     private fun onHeroInfo(faceImage: FvFaceImage) {
-        face_details_stats_view.setFaceImage(
-                FvFaceImage(
-                        faceImage.smilingProb,
-                        faceImage.leftEyeProb, faceImage.rightEyeProb, faceImage.imageBitmap,
-                        faceImage.boundingBox
-                ))
+//        face_details_stats_view.setFaceDetailStats(
+//                FvFaceImage(
+//                        faceImage.smilingProb,
+//                        faceImage.leftEyeProb, faceImage.rightEyeProb, faceImage.imageBitmap,
+//                        faceImage.boundingBox
+//                ))
 
         // File(faceImage.imageBitmapUri.path
 
