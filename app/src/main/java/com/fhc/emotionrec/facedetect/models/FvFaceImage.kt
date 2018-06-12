@@ -17,23 +17,23 @@ import java.util.*
 
 @Parcelize
 data class FaceIdParcel(val uuid: UUID, val color: Int, val faceImages: List<FvFaceImageParcel>) :
-    Parcelable {
+        Parcelable {
     companion object {
         fun create(faceId: FaceId, contentResolver: ContentResolver): FaceIdParcel {
             return FaceIdParcel(faceId.uuid,
-                faceId.color,
-                faceId.faceImages.map { FvFaceImageParcel.create(contentResolver, it) })
+                    faceId.color,
+                    faceId.faceImages.map { FvFaceImageParcel.create(contentResolver, it) })
         }
     }
 }
 
 @Parcelize
 data class FvFaceImageParcel(
-    val smilingProb: Float,
-    val leftEyeProb: Float,
-    val rightEyeProb: Float,
-    val imageBitmapUri: String,
-    val boundingBox: Rect
+        val smilingProb: Float,
+        val leftEyeProb: Float,
+        val rightEyeProb: Float,
+        val imageBitmapUri: Uri,
+        val boundingBox: Rect
 ) : Parcelable {
     companion object {
         fun imageToUri(contentResolver: ContentResolver, bitmap: Bitmap): Uri {
@@ -44,25 +44,25 @@ data class FvFaceImageParcel(
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
             }
             MediaStore.Images.Media.insertImage(
-                contentResolver,
-                file.absolutePath,
-                file.name,
-                file.name
+                    contentResolver,
+                    file.absolutePath,
+                    file.name,
+                    file.name
             )
             return file.toUri()
         }
 
         fun create(
-            contentResolver: ContentResolver,
-            faceImage: FvFaceImage
+                contentResolver: ContentResolver,
+                faceImage: FvFaceImage
         ): FvFaceImageParcel {
             with(faceImage) {
                 return FvFaceImageParcel(
-                    smilingProb,
-                    leftEyeProb,
-                    rightEyeProb,"",
-//                    imageToUri(contentResolver, imageBitmap),
-                    boundingBox
+                        smilingProb,
+                        leftEyeProb,
+                        rightEyeProb,
+                        imageToUri(contentResolver, imageBitmap),
+                        boundingBox
                 )
             }
 
@@ -71,23 +71,24 @@ data class FvFaceImageParcel(
 }
 
 data class FvFaceImage(
-    val smilingProb: Float,
-    val leftEyeProb: Float,
-    val rightEyeProb: Float,
-    val imageBitmap: Bitmap,
-    val boundingBox: Rect
+        val smilingProb: Float,
+        val leftEyeProb: Float,
+        val rightEyeProb: Float,
+        val imageBitmap: Bitmap,
+        val boundingBox: Rect,
+        val imageBitmapUri: Uri? = null
 ) {
     companion object {
         fun create(
-            firebaseVisionFace: FirebaseVisionFace,
-            firebaseVisionImage: FirebaseVisionImage
+                firebaseVisionFace: FirebaseVisionFace,
+                firebaseVisionImage: FirebaseVisionImage
         ): FvFaceImage {
             return FvFaceImage(
-                firebaseVisionFace.smilingProbability,
-                firebaseVisionFace.leftEyeOpenProbability,
-                firebaseVisionFace.rightEyeOpenProbability,
-                firebaseVisionImage.bitmapForDebugging,
-                firebaseVisionFace.boundingBox
+                    firebaseVisionFace.smilingProbability,
+                    firebaseVisionFace.leftEyeOpenProbability,
+                    firebaseVisionFace.rightEyeOpenProbability,
+                    firebaseVisionImage.bitmapForDebugging,
+                    firebaseVisionFace.boundingBox
             )
         }
     }

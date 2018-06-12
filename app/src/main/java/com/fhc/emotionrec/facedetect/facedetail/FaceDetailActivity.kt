@@ -1,18 +1,24 @@
 package com.fhc.emotionrec.facedetect.facedetail
 
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import kotlinx.android.synthetic.main.activity_face_detail.*
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
 import com.fhc.emotionrec.facedetect.R
+import com.fhc.emotionrec.facedetect.facecamera.ColorController
 import com.fhc.emotionrec.facedetect.facedetail.adapter.FaceImageAdapter
 import com.fhc.emotionrec.facedetect.facedetail.network.predictionServiceApi
 import com.fhc.emotionrec.facedetect.facedetail.network.uploadImage
 import com.fhc.emotionrec.facedetect.models.FaceIdParcel
+import com.fhc.emotionrec.facedetect.models.FvFaceImage
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
@@ -30,30 +36,40 @@ class FaceDetailActivity : AppCompatActivity() {
         }
     }
 
+    private fun Uri.getBitmap(contentResolver: ContentResolver): Bitmap {
+        return MediaStore.Images.Media.getBitmap(contentResolver, this)
+    }
+
+    private var faceIdParcel: FaceIdParcel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_face_detail)
-        val faceIdParcel = intent.getParcelableExtra("faceIdParcel") as FaceIdParcel
+        faceIdParcel = intent.getParcelableExtra("faceIdParcel") as FaceIdParcel
 
-//        val bitmap =
-//                MediaStore.Images.Media.getBitmap(this.contentResolver, faceIdParcel.faceImages[0].imageBitmapUri)
+        async {
+            val faceImages = faceIdParcel?.faceImages?.map { FvFaceImage(it.smilingProb, it.leftEyeProb, it.rightEyeProb, it.imageBitmapUri.getBitmap(contentResolver), it.boundingBox, it.imageBitmapUri) }
+            faceImages?.let { faceImages ->
+                launch(UI) {
+                    val firstFaceImage = faceImages[0]
+                    onHeroInfo(firstFaceImage)
 
-//        face_details_stats_view.setFaceImage(
-//                FvFaceImage(
-//                    faceIdParcel.smilingProb,
-//                        faceImageParcel.leftEyeProb, faceImageParcel.rightEyeProb, bitmap,
-//                        faceImageParcel.boundingBox, faceImageParcel.color
-//                )
-//        )
+                    face_detail_face_id_recycler_view.adapter = FaceImageAdapter(faceImages)
+                    face_detail_face_id_recycler_view.layoutManager = LinearLayoutManager(this@FaceDetailActivity)
+                }
+            }
+        }
+    }
 
-//        face_detail_hero_image.setImageBitmap(bitmap)
-        face_detail_face_id_recycler_view.adapter = FaceImageAdapter(faceIdParcel.faceImages)
-        face_detail_face_id_recycler_view.layoutManager = LinearLayoutManager(this)
+    private fun onHeroInfo(faceImage: FvFaceImage) {
+        face_details_stats_view.setFaceImage(
+                FvFaceImage(
+                        faceImage.smilingProb,
+                        faceImage.leftEyeProb, faceImage.rightEyeProb, faceImage.imageBitmap,
+                        faceImage.boundingBox
+                ))
 
-
-//        face_details_emotion_view.setPredictionResponse("ajrajkr")
-//        getPredictionResponse(File(faceImageParcel.imageBitmapUri.path))
+        // File(faceImage.imageBitmapUri.path
 
     }
 

@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class FaceId(val uuid: UUID, val color: Int, faceImage: FvFaceImage) {
-    val faceImages: MutableList<FvFaceImage> = ArrayList()
+    var faceImages: MutableList<FvFaceImage> = ArrayList()
 
     init {
         faceImages.add(faceImage)
@@ -27,6 +27,7 @@ class FaceId(val uuid: UUID, val color: Int, faceImage: FvFaceImage) {
 
     fun addFaceImage(newFaceImage: FvFaceImage) {
         faceImages.add(0, newFaceImage)
+        faceImages = faceImages.take(3).toMutableList()
     }
 }
 
