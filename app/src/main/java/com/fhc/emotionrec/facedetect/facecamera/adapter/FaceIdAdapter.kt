@@ -5,7 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.fhc.emotionrec.facedetect.R
-import com.fhc.emotionrec.facedetect.facecamera.GraphicFaceTrackerFactory.FaceTrackerListener
+import com.fhc.emotionrec.facedetect.facecamera.ColorController
+import com.fhc.emotionrec.facedetect.facecamera.FirebaseVisionFaceTracker
 import com.fhc.emotionrec.facedetect.facecamera.debug
 import com.fhc.emotionrec.facedetect.models.FvFaceImage
 import kotlinx.android.synthetic.main.view_face_id.view.*
@@ -30,10 +31,18 @@ class FaceId(val uuid: UUID, val color: Int, faceImage: FvFaceImage) {
 }
 
 class FaceIdAdapter(
-    private val listener: Listener,
-    private val idFaces: MutableList<FaceId> = mutableListOf()
+        private val listener: Listener,
+        private val idFaces: MutableList<FaceId> = mutableListOf()
 ) : RecyclerView.Adapter<FaceIdViewHolder>(),
-    FaceTrackerListener, FaceIdViewHolder.Listener {
+        FirebaseVisionFaceTracker.Listener, FaceIdViewHolder.Listener {
+    override fun initItem(uuid: UUID, faceImage: FvFaceImage) {
+
+    }
+
+    override fun newItem(uuid: UUID, faceImage: FvFaceImage) {
+        "new Item".debug("faceId")
+        launch(UI) { addFaceId(FaceId(uuid, ColorController.getColor(uuid), faceImage)) }
+    }
 
     interface Listener {
         fun onFaceImageClicked(faceId: FaceId)
@@ -41,11 +50,6 @@ class FaceIdAdapter(
 
     companion object {
         private const val DESTROY_DELAY_SECONDS = 3L
-    }
-
-    override fun newItem(uuid: UUID, face: FvFaceImage, color: Int) {
-        "new Item".debug("faceId")
-        launch(UI) { addFaceId(FaceId(uuid, color, face)) }
     }
 
     override fun onUpdateItem(uuid: UUID, face: FvFaceImage) {
@@ -86,7 +90,7 @@ class FaceIdAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FaceIdViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.view_face_id, parent, false)
+                .inflate(R.layout.view_face_id, parent, false)
         return FaceIdViewHolder(view, this)
     }
 
@@ -107,7 +111,7 @@ class FaceIdAdapter(
 }
 
 class FaceIdViewHolder(itemView: View, val listener: Listener) : RecyclerView.ViewHolder(itemView),
-    View.OnClickListener {
+        View.OnClickListener {
     interface Listener {
         fun onFaceClicked(adapterPosition: Int)
     }

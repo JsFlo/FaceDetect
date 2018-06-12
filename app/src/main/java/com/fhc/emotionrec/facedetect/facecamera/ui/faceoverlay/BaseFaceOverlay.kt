@@ -22,12 +22,17 @@ abstract class BaseFaceOverlay(@Volatile var face: FvFaceImage) : Overlay() {
     }
 
     abstract fun onDraw(canvas: Canvas, face: FvFaceImage, overlayTransformations: OverlayTransformations)
+
+    override fun destroy() {
+        overlayTransformations = null
+    }
 }
 
-class GraphicFaceOverlay(faceImage: FvFaceImage, val selectedColor: Int) : BaseFaceOverlay(faceImage) {
+class GraphicFaceOverlay(faceImage: FvFaceImage, selectedColor: Int) : BaseFaceOverlay(faceImage) {
 
     private val facePositionPaint = Paint()
     private val boxPaint = Paint()
+    private var cleared = false
 
     init {
         facePositionPaint.color = selectedColor
@@ -41,28 +46,34 @@ class GraphicFaceOverlay(faceImage: FvFaceImage, val selectedColor: Int) : BaseF
     private var translatedCenterY: Float = 0f
 
     override fun onDraw(canvas: Canvas, face: FvFaceImage, overlayTransformations: OverlayTransformations) {
-        with(overlayTransformations) {
+        if (!cleared) {
+            with(overlayTransformations) {
 
-            val centerX = face.boundingBox.exactCenterX()
-            val centerY = face.boundingBox.exactCenterY()
+                val centerX = face.boundingBox.exactCenterX()
+                val centerY = face.boundingBox.exactCenterY()
 
-            translatedCenterX = translateX(centerX)
-            translatedCenterY = translateY(centerY)
+                translatedCenterX = translateX(centerX)
+                translatedCenterY = translateY(centerY)
 
-            canvas.drawCircle(translatedCenterX, translatedCenterY,
-                    FACE_POSITION_RADIUS, facePositionPaint)
+                canvas.drawCircle(translatedCenterX, translatedCenterY,
+                        FACE_POSITION_RADIUS, facePositionPaint)
 
-            canvas.drawCircle(translatedCenterX, translatedCenterY, translatedCenterX - translateX(face.boundingBox.left.toFloat()), boxPaint)
+                canvas.drawCircle(translatedCenterX, translatedCenterY,
+                        translatedCenterX - translateX(face.boundingBox.left.toFloat()),
+                        boxPaint)
+//                cleared = false
 
-//            canvas.drawRect(translateX(face.boundingBox.left.toFloat()),
-//                    translateY(face.boundingBox.top.toFloat()),
-//                    translateX(face.boundingBox.right.toFloat()),
-//                    translateY(face.boundingBox.bottom.toFloat()), boxPaint)
+            }
         }
     }
 
     override fun clear() {
-        //
+        // TODO
+        cleared = true
+    }
+
+    override fun destroy() {
+        cleared = true
     }
 
     companion object {

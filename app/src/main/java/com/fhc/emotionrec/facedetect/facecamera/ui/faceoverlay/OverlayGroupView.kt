@@ -20,6 +20,7 @@ abstract class Overlay {
     abstract fun onCreate(overlayTransformations: OverlayTransformations)
     abstract fun draw(canvas: Canvas)
     abstract fun clear()
+    abstract fun destroy()
 }
 
 class OverlayGroupView(context: Context, attrs: AttributeSet?) : View(context, attrs),
