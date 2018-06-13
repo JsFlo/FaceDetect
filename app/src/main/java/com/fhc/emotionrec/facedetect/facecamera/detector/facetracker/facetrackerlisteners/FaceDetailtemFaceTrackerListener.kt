@@ -13,51 +13,61 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class FaceDetailItemFaceTrackerListener(
-    val adapter: FaceDetailItemAdapter,
-    val listener: Listener,
-    val colorFactory: ColorFactory
+        val adapter: FaceDetailItemAdapter,
+        val listener: Listener,
+        val colorFactory: ColorFactory
 ) :
-    FirebaseVisionFaceTracker.Listener, FaceDetailItemAdapter.Listener {
+        FirebaseVisionFaceTracker.Listener, FaceDetailItemAdapter.Listener {
+
     interface Listener {
-        fun onFaceDetailClicked(name: String)
+        fun onFaceDetailClicked(uuid: UUID, faceDetailItems: List<FaceDetailItem>)
     }
+
+    private val faceDetailMap = HashMap<UUID, MutableList<FaceDetailItem>>()
 
     init {
         adapter.listener = this
     }
 
     override fun onFaceDetailItemClicked(faceDetailItem: FaceDetailItem) {
-        listener.onFaceDetailClicked("bleh")
-    }
-
-    private fun FvFaceImage.toFaceDetailItem(uuid: UUID): FaceDetailItem {
-        return FaceDetailItem(
-            uuid, colorFactory.getColor(uuid), imageBitmap,
-            FaceDetailStats(
-                smilingProb,
-                leftEyeProb,
-                rightEyeProb
-            )
-        )
+        faceDetailMap[faceDetailItem.uuid]?.let { faceDetailItems ->
+            listener.onFaceDetailClicked(faceDetailItem.uuid, faceDetailItems)
+        }
     }
 
     override fun initItem(uuid: UUID, faceImage: FvFaceImage) {}
 
     override fun newItem(uuid: UUID, faceImage: FvFaceImage) {
-        launch(UI) { adapter.addFaceDetailItem(faceImage.toFaceDetailItem(uuid)) }
+        val faceDetailItem = faceImage.toFaceDetailItem(uuid)
+        faceDetailMap[uuid] = mutableListOf(faceDetailItem)
+        launch(UI) { adapter.addFaceDetailItem(faceDetailItem) }
     }
 
     override fun onUpdateItem(uuid: UUID, faceImage: FvFaceImage) {
-        launch(UI) { adapter.updateFaceDetailItem(faceImage.toFaceDetailItem(uuid)) }
+        val faceDetailItem = faceImage.toFaceDetailItem(uuid)
+        faceDetailMap[uuid]?.add(faceDetailItem)
+        launch(UI) { adapter.updateFaceDetailItem(faceDetailItem) }
     }
 
     override fun onMissingItem(uuid: UUID) {}
 
     override fun onDestroyItem(uuid: UUID) {
+        faceDetailMap.remove(uuid)
         async {
             delay(DESTROY_DELAY_SECONDS, TimeUnit.SECONDS)
             launch(UI) { adapter.removeFaceDetailItem(uuid) }
         }
+    }
+
+    private fun FvFaceImage.toFaceDetailItem(uuid: UUID): FaceDetailItem {
+        return FaceDetailItem(
+                uuid, colorFactory.getColor(uuid), imageBitmap,
+                FaceDetailStats(
+                        smilingProb,
+                        leftEyeProb,
+                        rightEyeProb
+                )
+        )
     }
 
     companion object {
