@@ -30,7 +30,7 @@
         app:layout_constraintRight_toLeftOf="@id/face_details_emotion_view"
         app:layout_constraintTop_toBottomOf="@id/face_detail_hero_image" />
 
-    <com.fhc.emotionrec.facedetect.facedetail.ui.FaceDetailEmotionRec
+    <com.fhc.emotionrec.facedetect.ui.FaceDetailEmotionRec
         android:id="@+id/face_details_emotion_view"
         android:layout_width="0dp"
         android:layout_height="0dp"

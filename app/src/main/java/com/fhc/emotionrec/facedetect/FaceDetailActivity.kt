@@ -1,4 +1,4 @@
-package com.fhc.emotionrec.facedetect.facedetail
+package com.fhc.emotionrec.facedetect
 
 import android.content.ContentResolver
 import android.content.Context
@@ -8,7 +8,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.support.v7.app.AppCompatActivity
-import com.fhc.emotionrec.facedetect.R
 import com.fhc.emotionrec.facedetect.models.FvFaceImage
 import com.fhc.emotionrec.facedetect.models.TrackedFaceImageParcel
 

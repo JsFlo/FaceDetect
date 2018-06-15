@@ -1,4 +1,4 @@
-package com.fhc.emotionrec.facedetect.facecamera.detector
+package com.fhc.emotionrec.facedetect.detector
 
 import android.util.SparseArray
 import com.fhc.emotionrec.facedetect.models.FvFaceImage

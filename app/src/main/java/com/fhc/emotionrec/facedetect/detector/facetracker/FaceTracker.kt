@@ -1,4 +1,4 @@
-package com.fhc.emotionrec.facedetect.facecamera.detector.facetracker
+package com.fhc.emotionrec.facedetect.detector.facetracker
 
 import com.fhc.emotionrec.facedetect.models.FvFaceImage
 import com.google.android.gms.vision.Detector

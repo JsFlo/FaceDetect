@@ -1,11 +1,11 @@
-package com.fhc.emotionrec.facedetect.facecamera.ui.faceoverlay
+package com.fhc.emotionrec.facedetect.ui.faceoverlay
 
 import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.View
-import com.fhc.emotionrec.facedetect.facecamera.ui.camera.CameraInfo
-import com.fhc.emotionrec.facedetect.facecamera.ui.camera.PreviewSurfaceListener
+import com.fhc.emotionrec.facedetect.ui.camera.CameraInfo
+import com.fhc.emotionrec.facedetect.ui.camera.PreviewSurfaceListener
 import com.google.android.gms.vision.CameraSource
 
 interface OverlayTransformations {
@@ -24,7 +24,7 @@ abstract class Overlay {
 }
 
 class OverlayGroupView(context: Context, attrs: AttributeSet?) : View(context, attrs),
-        OverlayTransformations, PreviewSurfaceListener {
+    OverlayTransformations, PreviewSurfaceListener {
 
     private val lock = Object()
     private var previewCameraInfo: CameraInfo? = null

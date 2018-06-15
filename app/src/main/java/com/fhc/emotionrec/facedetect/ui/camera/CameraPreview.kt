@@ -1,4 +1,4 @@
-package com.fhc.emotionrec.facedetect.facecamera.ui.camera
+package com.fhc.emotionrec.facedetect.ui.camera
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -44,7 +44,8 @@ class PreviewCameraSurface(context: Context, attrs: AttributeSet?) :
             cameraSource?.let {
                 val size = it.previewSize
                 val (min, max) = listOf(size.width, size.height).sorted().let { Pair(it[0], it[1]) }
-                val cameraInfo = CameraInfo(min, max, it.cameraFacing)
+                val cameraInfo =
+                    CameraInfo(min, max, it.cameraFacing)
                 previewListeners?.forEach { it.onCameraInfo(cameraInfo) }
             }
             startRequested = false

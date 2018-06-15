@@ -1,8 +1,8 @@
-package com.fhc.emotionrec.facedetect.facecamera.detector.facetracker.facetrackerlisteners
+package com.fhc.emotionrec.facedetect.detector.facetracker.facetrackerlisteners
 
-import com.fhc.emotionrec.facedetect.facecamera.detector.facetracker.FirebaseVisionFaceTracker
-import com.fhc.emotionrec.facedetect.facecamera.ui.faceoverlay.GraphicFaceOverlay
-import com.fhc.emotionrec.facedetect.facecamera.ui.faceoverlay.OverlayGroupView
+import com.fhc.emotionrec.facedetect.detector.facetracker.FirebaseVisionFaceTracker
+import com.fhc.emotionrec.facedetect.ui.faceoverlay.GraphicFaceOverlay
+import com.fhc.emotionrec.facedetect.ui.faceoverlay.OverlayGroupView
 import com.fhc.emotionrec.facedetect.models.FvFaceImage
 import java.util.*
 
@@ -17,7 +17,10 @@ class GraphicFaceOverlayFaceTrackerListener(
     }
 
     override fun newItem(uuid: UUID, faceImage: FvFaceImage) {
-        graphicFaceOverlay = GraphicFaceOverlay(faceImage, colorFactory.getColor(uuid))
+        graphicFaceOverlay = GraphicFaceOverlay(
+            faceImage,
+            colorFactory.getColor(uuid)
+        )
             .also { overlayGroupView.addOverlay(it) }
     }
 

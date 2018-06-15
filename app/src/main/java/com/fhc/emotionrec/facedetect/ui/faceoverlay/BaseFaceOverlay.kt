@@ -1,4 +1,4 @@
-package com.fhc.emotionrec.facedetect.facecamera.ui.faceoverlay
+package com.fhc.emotionrec.facedetect.ui.faceoverlay
 
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -39,7 +39,8 @@ class GraphicFaceOverlay(faceImage: FvFaceImage, selectedColor: Int) : BaseFaceO
 
         boxPaint.color = selectedColor
         boxPaint.style = Paint.Style.STROKE
-        boxPaint.strokeWidth = BOX_STROKE_WIDTH
+        boxPaint.strokeWidth =
+                BOX_STROKE_WIDTH
     }
 
     private var translatedCenterX: Float = 0f
@@ -56,7 +57,7 @@ class GraphicFaceOverlay(faceImage: FvFaceImage, selectedColor: Int) : BaseFaceO
                 translatedCenterY = translateY(centerY)
 
                 canvas.drawCircle(translatedCenterX, translatedCenterY,
-                        FACE_POSITION_RADIUS, facePositionPaint)
+                    FACE_POSITION_RADIUS, facePositionPaint)
 
                 canvas.drawCircle(translatedCenterX, translatedCenterY,
                         translatedCenterX - translateX(face.boundingBox.left.toFloat()),

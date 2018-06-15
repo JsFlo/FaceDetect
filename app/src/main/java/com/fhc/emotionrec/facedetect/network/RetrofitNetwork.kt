@@ -1,6 +1,6 @@
-package com.fhc.emotionrec.facedetect.facedetail.network
+package com.fhc.emotionrec.facedetect.network
 
-import com.fhc.emotionrec.facedetect.facedetail.models.PredictionResponse
+import com.fhc.emotionrec.facedetect.models.PredictionResponse
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient

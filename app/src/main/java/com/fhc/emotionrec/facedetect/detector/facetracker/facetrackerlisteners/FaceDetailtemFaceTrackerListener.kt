@@ -1,8 +1,8 @@
-package com.fhc.emotionrec.facedetect.facecamera.detector.facetracker.facetrackerlisteners
+package com.fhc.emotionrec.facedetect.detector.facetracker.facetrackerlisteners
 
 import com.fhc.emotionrec.facedetect.adapter.FaceDetailItem
 import com.fhc.emotionrec.facedetect.adapter.FaceDetailItemAdapter
-import com.fhc.emotionrec.facedetect.facecamera.detector.facetracker.FirebaseVisionFaceTracker
+import com.fhc.emotionrec.facedetect.detector.facetracker.FirebaseVisionFaceTracker
 import com.fhc.emotionrec.facedetect.models.FvFaceImage
 import com.fhc.emotionrec.facedetect.ui.FaceDetailStats
 import kotlinx.coroutines.experimental.android.UI

@@ -1,20 +1,18 @@
-package com.fhc.emotionrec.facedetect.facecamera
+package com.fhc.emotionrec.facedetect
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import com.fhc.emotionrec.facedetect.R
 import com.fhc.emotionrec.facedetect.adapter.FaceDetailItem
 import com.fhc.emotionrec.facedetect.adapter.FaceDetailItemAdapter
-import com.fhc.emotionrec.facedetect.facecamera.detector.FirebaseVisionDetectorWrapper
-import com.fhc.emotionrec.facedetect.facecamera.detector.facetracker.FirebaseVisionFaceTracker
-import com.fhc.emotionrec.facedetect.facecamera.detector.facetracker.facetrackerlisteners.ColorFaceTrackerListener
-import com.fhc.emotionrec.facedetect.facecamera.detector.facetracker.facetrackerlisteners.FaceDetailItemFaceTrackerListener
-import com.fhc.emotionrec.facedetect.facecamera.detector.facetracker.facetrackerlisteners.GraphicFaceOverlayFaceTrackerListener
-import com.fhc.emotionrec.facedetect.facecamera.ui.faceoverlay.OverlayGroupView
-import com.fhc.emotionrec.facedetect.facedetail.FaceDetailActivity
+import com.fhc.emotionrec.facedetect.detector.FirebaseVisionDetectorWrapper
+import com.fhc.emotionrec.facedetect.detector.facetracker.FirebaseVisionFaceTracker
+import com.fhc.emotionrec.facedetect.detector.facetracker.facetrackerlisteners.ColorFaceTrackerListener
+import com.fhc.emotionrec.facedetect.detector.facetracker.facetrackerlisteners.FaceDetailItemFaceTrackerListener
+import com.fhc.emotionrec.facedetect.detector.facetracker.facetrackerlisteners.GraphicFaceOverlayFaceTrackerListener
+import com.fhc.emotionrec.facedetect.ui.faceoverlay.OverlayGroupView
 import com.fhc.emotionrec.facedetect.models.FvFaceImage
 import com.fhc.emotionrec.facedetect.models.TrackedFaceImageParcel
 import com.google.android.gms.vision.CameraSource
@@ -102,7 +100,7 @@ class EmotionDetectionActivity : AppCompatActivity(),
             cameraSource = CameraSource.Builder(this, detector)
                 .setRequestedPreviewSize(640, 480)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setRequestedFps(30.0f)
+                .setRequestedFps(10.0f)
                 .build()
             preview_surface_view.start(cameraSource!!)
         }
@@ -123,7 +121,6 @@ class GraphicFaceTrackerFactory(
     private val overlayGroupView: OverlayGroupView,
     private val faceTrackerListener: FirebaseVisionFaceTracker.Listener
 ) : MultiProcessor.Factory<FvFaceImage> {
-
 
     override fun create(faceImage: FvFaceImage?): Tracker<FvFaceImage> {
 
