@@ -15,8 +15,8 @@ import com.fhc.emotionrec.facedetect.facecamera.detector.facetracker.facetracker
 import com.fhc.emotionrec.facedetect.facecamera.detector.facetracker.facetrackerlisteners.GraphicFaceOverlayFaceTrackerListener
 import com.fhc.emotionrec.facedetect.facecamera.ui.faceoverlay.OverlayGroupView
 import com.fhc.emotionrec.facedetect.facedetail.FaceDetailActivity
-import com.fhc.emotionrec.facedetect.models.FaceIdParcel
 import com.fhc.emotionrec.facedetect.models.FvFaceImage
+import com.fhc.emotionrec.facedetect.models.TrackedFaceImageParcel
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.MultiProcessor
 import com.google.android.gms.vision.Tracker
@@ -30,7 +30,7 @@ import kotlinx.coroutines.experimental.launch
 import java.util.*
 
 class EmotionDetectionActivity : AppCompatActivity(),
-        FaceDetailItemFaceTrackerListener.Listener {
+    FaceDetailItemFaceTrackerListener.Listener {
 
     private var faceTrackerProcessor: MultiProcessor<FvFaceImage>? = null
     private var mlKitFaceDetector: FirebaseVisionFaceDetector? = null
@@ -47,20 +47,20 @@ class EmotionDetectionActivity : AppCompatActivity(),
         face_id_recycler_view.adapter = adapter
 
         val options = FirebaseVisionFaceDetectorOptions.Builder()
-                .setModeType(FirebaseVisionFaceDetectorOptions.ACCURATE_MODE)
-                .setClassificationType(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
-                .build()
+            .setModeType(FirebaseVisionFaceDetectorOptions.ACCURATE_MODE)
+            .setClassificationType(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
+            .build()
 
         mlKitFaceDetector = FirebaseVision.getInstance()
-                .getVisionFaceDetector(options)
+            .getVisionFaceDetector(options)
 
         faceTrackerProcessor = MultiProcessor.Builder<FvFaceImage>(
-                GraphicFaceTrackerFactory(
-                        overlay_group_view,
-                        FaceDetailItemFaceTrackerListener(adapter, this, ColorFaceTrackerListener)
-                )
+            GraphicFaceTrackerFactory(
+                overlay_group_view,
+                FaceDetailItemFaceTrackerListener(adapter, this, ColorFaceTrackerListener)
+            )
         )
-                .build()
+            .build()
 
         preview_surface_view.addListeners(overlay_group_view)
     }
@@ -68,25 +68,24 @@ class EmotionDetectionActivity : AppCompatActivity(),
     override fun onFaceDetailClicked(uuid: UUID, faceDetailItems: List<FaceDetailItem>) {
         camera_progress.visibility = View.VISIBLE
         async {
-            val faceIdParcel = FaceIdParcel.create(faceId, contentResolver)
+            val faceIdParcel = TrackedFaceImageParcel.create(
+                uuid,
+                ColorFaceTrackerListener.getColor(uuid),
+                faceDetailItems,
+                contentResolver
+            )
             launch(UI) {
                 camera_progress.visibility = View.GONE
                 startActivity(
-                        FaceDetailActivity.newIntent(
-                                this@EmotionDetectionActivity,
-                                faceIdParcel
-                        )
+                    FaceDetailActivity.newIntent(
+                        this@EmotionDetectionActivity,
+                        faceIdParcel
+                    )
                 )
             }
 
         }
     }
-//
-//
-//    override fun onFaceImageClicked(faceId: FaceId) {
-//
-//
-//    }
 
     override fun onResume() {
         super.onResume()
@@ -96,15 +95,15 @@ class EmotionDetectionActivity : AppCompatActivity(),
         } else {
             detector =
                     FirebaseVisionDetectorWrapper(
-                            mlKitFaceDetector!!
+                        mlKitFaceDetector!!
                     )
             detector?.setProcessor(faceTrackerProcessor)
 
             cameraSource = CameraSource.Builder(this, detector)
-                    .setRequestedPreviewSize(640, 480)
-                    .setFacing(CameraSource.CAMERA_FACING_BACK)
-                    .setRequestedFps(30.0f)
-                    .build()
+                .setRequestedPreviewSize(640, 480)
+                .setFacing(CameraSource.CAMERA_FACING_BACK)
+                .setRequestedFps(30.0f)
+                .build()
             preview_surface_view.start(cameraSource!!)
         }
     }
@@ -121,21 +120,21 @@ class EmotionDetectionActivity : AppCompatActivity(),
 }
 
 class GraphicFaceTrackerFactory(
-        private val overlayGroupView: OverlayGroupView,
-        private val faceTrackerListener: FirebaseVisionFaceTracker.Listener
+    private val overlayGroupView: OverlayGroupView,
+    private val faceTrackerListener: FirebaseVisionFaceTracker.Listener
 ) : MultiProcessor.Factory<FvFaceImage> {
 
 
     override fun create(faceImage: FvFaceImage?): Tracker<FvFaceImage> {
 
         return FirebaseVisionFaceTracker(
-                faceImage!!,
-                ColorFaceTrackerListener,
-                GraphicFaceOverlayFaceTrackerListener(
-                        overlayGroupView,
-                        ColorFaceTrackerListener
-                ),
-                faceTrackerListener
+            faceImage!!,
+            ColorFaceTrackerListener,
+            GraphicFaceOverlayFaceTrackerListener(
+                overlayGroupView,
+                ColorFaceTrackerListener
+            ),
+            faceTrackerListener
         )
     }
 }

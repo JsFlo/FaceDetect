@@ -8,33 +8,33 @@ import android.os.Environment
 import android.os.Parcelable
 import android.provider.MediaStore
 import androidx.core.net.toUri
+import com.fhc.emotionrec.facedetect.adapter.FaceDetailItem
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import kotlinx.android.parcel.Parcelize
 import java.io.File
 import java.util.*
 
-class FaceId(val uuid: UUID, val color: Int, faceImage: FvFaceImage) {
-    var faceImages: MutableList<FvFaceImage> = ArrayList()
-
-    init {
-        faceImages.add(faceImage)
-    }
-
-    fun addFaceImage(newFaceImage: FvFaceImage) {
-        faceImages.add(0, newFaceImage)
-        faceImages = faceImages.take(3).toMutableList()
-    }
-}
-
 @Parcelize
-data class FaceIdParcel(val uuid: UUID, val color: Int, val faceImages: List<FvFaceImageParcel>) :
+data class TrackedFaceImageParcel(
+    val uuid: UUID,
+    val color: Int,
+    val faceImages: List<FvFaceImageParcel>
+) :
     Parcelable {
+
     companion object {
-        fun create(faceId: FaceId, contentResolver: ContentResolver): FaceIdParcel {
-            return FaceIdParcel(faceId.uuid,
-                faceId.color,
-                faceId.faceImages.map { FvFaceImageParcel.create(contentResolver, it) })
+        fun create(
+            uuid: UUID,
+            color: Int,
+            faceDetailItems: List<FaceDetailItem>,
+            contentResolver: ContentResolver
+        ): TrackedFaceImageParcel {
+
+            return TrackedFaceImageParcel(
+                uuid,
+                color,
+                faceDetailItems.map { FvFaceImageParcel.create(contentResolver, it) })
         }
     }
 }
@@ -66,14 +66,14 @@ data class FvFaceImageParcel(
 
         fun create(
             contentResolver: ContentResolver,
-            faceImage: FvFaceImage
+            faceDetailItem: FaceDetailItem
         ): FvFaceImageParcel {
-            with(faceImage) {
+            with(faceDetailItem) {
                 return FvFaceImageParcel(
-                    smilingProb,
-                    leftEyeProb,
-                    rightEyeProb,
-                    imageToUri(contentResolver, imageBitmap),
+                    faceDetailStats.smilingProb,
+                    faceDetailStats.leftEyeProb,
+                    faceDetailStats.rightEyeProb,
+                    imageToUri(contentResolver, image),
                     boundingBox
                 )
             }

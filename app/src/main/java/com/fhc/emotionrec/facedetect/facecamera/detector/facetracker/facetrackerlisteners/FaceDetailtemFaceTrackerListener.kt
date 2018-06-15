@@ -45,7 +45,7 @@ class FaceDetailItemFaceTrackerListener(
 
     override fun onUpdateItem(uuid: UUID, faceImage: FvFaceImage) {
         val faceDetailItem = faceImage.toFaceDetailItem(uuid)
-        faceDetailMap[uuid]?.add(faceDetailItem)
+        addNewImageToFace(uuid, faceDetailItem)
         launch(UI) { adapter.updateFaceDetailItem(faceDetailItem) }
     }
 
@@ -61,13 +61,23 @@ class FaceDetailItemFaceTrackerListener(
 
     private fun FvFaceImage.toFaceDetailItem(uuid: UUID): FaceDetailItem {
         return FaceDetailItem(
-                uuid, colorFactory.getColor(uuid), imageBitmap,
+                uuid, colorFactory.getColor(uuid), imageBitmap, boundingBox,
                 FaceDetailStats(
                         smilingProb,
                         leftEyeProb,
                         rightEyeProb
                 )
         )
+    }
+
+    private fun addNewImageToFace(uuid: UUID, faceDetailItem: FaceDetailItem){
+        val listOfFaces =faceDetailMap[uuid]
+        if(listOfFaces != null) {
+            listOfFaces.add(0, faceDetailItem)
+            if(listOfFaces.size > 3) {
+                listOfFaces.removeAt(3)
+            }
+        }
     }
 
     companion object {

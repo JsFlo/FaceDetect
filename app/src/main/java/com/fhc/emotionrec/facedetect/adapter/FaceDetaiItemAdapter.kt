@@ -1,6 +1,7 @@
 package com.fhc.emotionrec.facedetect.adapter
 
 import android.graphics.Bitmap
+import android.graphics.Rect
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ data class FaceDetailItem(
     val uuid: UUID,
     val color: Int,
     val image: Bitmap,
+    val boundingBox: Rect,
     val faceDetailStats: FaceDetailStats
 ) {
     override fun equals(other: Any?): Boolean {
