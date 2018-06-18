@@ -92,9 +92,7 @@ class EmotionDetectionActivity : AppCompatActivity(),
             preview_surface_view.start(cameraSource!!)
         } else {
             detector =
-                    FirebaseVisionDetectorWrapper(
-                        mlKitFaceDetector!!
-                    )
+                    FirebaseVisionDetectorWrapper(mlKitFaceDetector!!)
             detector?.setProcessor(faceTrackerProcessor)
 
             cameraSource = CameraSource.Builder(this, detector)

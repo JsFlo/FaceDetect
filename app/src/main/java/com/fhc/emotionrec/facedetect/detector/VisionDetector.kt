@@ -31,7 +31,7 @@ class FirebaseVisionDetectorWrapper(private val firebaseVisionFaceDetector: Fire
             val result = runBlocking { firebaseVisionFaceDetector.detectImageSync(fvImage) }
 
             val sparseArray = SparseArray<FvFaceImage>()
-            result?.map { fvFace -> FvFaceImage.create(fvFace, fvImage) }
+            result?.map { fvFace -> FvFaceImage(fvFace, fvImage) }
                 ?.forEachIndexed { index, fvFaceImage ->
                     sparseArray.put(index, fvFaceImage)
                 }
@@ -42,6 +42,7 @@ class FirebaseVisionDetectorWrapper(private val firebaseVisionFaceDetector: Fire
     }
 }
 
+// using fromByteBuffer with grayscaleImageData but could use bitmap
 private fun Frame.toFirebaseVisionImage(): FirebaseVisionImage {
     return FirebaseVisionImage.fromByteBuffer(
         grayscaleImageData,

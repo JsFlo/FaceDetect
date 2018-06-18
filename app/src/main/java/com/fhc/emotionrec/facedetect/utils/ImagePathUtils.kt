@@ -1,11 +1,34 @@
 package com.emotionrec.emotionrecapp.utils
 
+import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
+import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
 import android.widget.ImageView
+import androidx.core.net.toUri
+import java.io.File
 import java.io.IOException
+import java.util.*
+
+fun imageToUri(contentResolver: ContentResolver, bitmap: Bitmap): Uri {
+    val path = Environment.getExternalStorageDirectory().toString()
+
+    val file = File(path, "bitmap_${Date()}.png")
+    file.outputStream().use {
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+    }
+    MediaStore.Images.Media.insertImage(
+            contentResolver,
+            file.absolutePath,
+            file.name,
+            file.name
+    )
+    return file.toUri()
+}
 
 fun ImageView.setImage(imagePath: String): Bitmap {
     val targetW = width

@@ -26,12 +26,12 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
-    implementation 'com.google.firebase:firebase-core:15.0.2'
-    implementation 'com.google.firebase:firebase-ml-vision:15.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation 'com.google.firebase:firebase-core:16.0.1'
+    implementation 'com.google.firebase:firebase-ml-vision:16.0.0'
     implementation 'androidx.core:core-ktx:0.3'
     implementation 'com.android.support:design:27.1.1'
-    implementation 'com.google.android.gms:play-services-vision:15.0.0'
+    implementation 'com.google.android.gms:play-services-vision:15.0.2'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:0.22.5"
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     def lifecycle_version = "1.1.1"
@@ -39,7 +39,7 @@ dependencies {
     // ViewModel and LiveData
     implementation "android.arch.lifecycle:extensions:$lifecycle_version"
 
-    compile 'com.akexorcist:RoundCornerProgressBar:2.0.3'
+    implementation 'com.akexorcist:RoundCornerProgressBar:2.0.3'
 
     // network
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'

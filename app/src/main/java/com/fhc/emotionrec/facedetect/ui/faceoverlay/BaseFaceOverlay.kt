@@ -46,21 +46,21 @@ class GraphicFaceOverlay(faceImage: FvFaceImage, selectedColor: Int) : BaseFaceO
     private var translatedCenterX: Float = 0f
     private var translatedCenterY: Float = 0f
 
-    override fun onDraw(canvas: Canvas, face: FvFaceImage, overlayTransformations: OverlayTransformations) {
+    override fun onDraw(canvas: Canvas, faceImage: FvFaceImage, overlayTransformations: OverlayTransformations) {
         if (!cleared) {
             with(overlayTransformations) {
 
-                val centerX = face.boundingBox.exactCenterX()
-                val centerY = face.boundingBox.exactCenterY()
+                val centerX = faceImage.fvFace.boundingBox.exactCenterX()
+                val centerY = faceImage.fvFace.boundingBox.exactCenterY()
 
                 translatedCenterX = translateX(centerX)
                 translatedCenterY = translateY(centerY)
 
                 canvas.drawCircle(translatedCenterX, translatedCenterY,
-                    FACE_POSITION_RADIUS, facePositionPaint)
+                        FACE_POSITION_RADIUS, facePositionPaint)
 
                 canvas.drawCircle(translatedCenterX, translatedCenterY,
-                        translatedCenterX - translateX(face.boundingBox.left.toFloat()),
+                        translatedCenterX - translateX(faceImage.fvFace.boundingBox.left.toFloat()),
                         boxPaint)
 //                cleared = false
 
