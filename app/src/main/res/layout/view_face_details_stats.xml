@@ -30,9 +30,10 @@
         style="@style/face_details_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/face_detail_left_eye_prob_label"
         app:layout_constraintLeft_toRightOf="@id/face_detail_left_eye_prob_label"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/face_detail_left_eye_prob_label" />
 
     <TextView
         android:id="@+id/face_detail_right_eye_prob_label"
@@ -48,9 +49,10 @@
         style="@style/face_details_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/face_detail_right_eye_prob_label"
         app:layout_constraintLeft_toRightOf="@id/face_detail_right_eye_prob_label"
         app:layout_constraintRight_toRightOf="@id/face_detail_left_eye_prob"
-        app:layout_constraintTop_toBottomOf="@id/face_detail_left_eye_prob" />
+        app:layout_constraintTop_toBottomOf="@id/face_detail_left_eye_prob_label" />
 
     <TextView
         android:id="@+id/face_detail_smiling_prob_label"
@@ -66,8 +68,9 @@
         style="@style/face_details_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/face_detail_smiling_prob_label"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintLeft_toRightOf="@id/face_detail_smiling_prob_label"
         app:layout_constraintRight_toRightOf="@id/face_detail_right_eye_prob"
-        app:layout_constraintTop_toBottomOf="@id/face_detail_right_eye_prob" />
+        app:layout_constraintTop_toBottomOf="@id/face_detail_right_eye_prob_label" />
 </android.support.constraint.ConstraintLayout>
