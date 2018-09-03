@@ -3,7 +3,7 @@ package com.fhc.emotionrec.facedetect.models
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
 import android.graphics.Rect
-import com.emotionrec.emotionrecapp.utils.toFilePath
+import com.fhc.emotionrec.facedetect.utils.toFilePath
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import java.util.*

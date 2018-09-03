@@ -1,40 +1,26 @@
 package com.fhc.emotionrec.facedetect.adapter
 
-import android.graphics.Rect
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.emotionrec.emotionrecapp.utils.setImage
+import com.fhc.emotionrec.facedetect.utils.setImage
 import com.fhc.emotionrec.facedetect.R
-import com.fhc.emotionrec.facedetect.ui.FaceDetailStats
+import com.fhc.emotionrec.facedetect.models.FaceImageEntity
 import kotlinx.android.synthetic.main.view_face_id.view.*
-import java.util.*
-
-data class FaceDetailItem(
-        val uuid: UUID,
-        val color: Int,
-        val imagePath: String,
-        val boundingBox: Rect,
-        val faceDetailStats: FaceDetailStats
-) {
-    override fun equals(other: Any?): Boolean {
-        return other is FaceDetailItem && uuid == other.uuid
-    }
-}
 
 class FaceDetailItemAdapter(
         var listener: Listener? = null,
-        private val faceDetailItems: MutableList<FaceDetailItem> = mutableListOf()
+        private val faceDetailItems: MutableList<FaceImageEntity> = mutableListOf()
 ) :
         RecyclerView.Adapter<FaceDetailItemViewHolder>(),
         FaceDetailItemViewHolder.Listener {
 
     interface Listener {
-        fun onFaceDetailItemClicked(faceDetailItem: FaceDetailItem)
+        fun onFaceDetailItemClicked(faceDetailItem: FaceImageEntity)
     }
 
-    fun swapFaceDetailItems(newFaceDetailItems: List<FaceDetailItem>?) {
+    fun swapFaceDetailItems(newFaceDetailItems: List<FaceImageEntity>?) {
         faceDetailItems.clear()
         faceDetailItems.addAll(newFaceDetailItems ?: listOf())
         notifyDataSetChanged()
@@ -51,7 +37,7 @@ class FaceDetailItemAdapter(
         with(faceDetailItem) {
             holder.itemView.face_id_image.setImage(imagePath)
             holder.itemView.face_id_image.borderColor = color
-            holder.itemView.face_id_face_detail.setFaceDetailStats(faceDetailStats)
+            holder.itemView.face_id_face_detail.setFaceDetailStats(smilingProb, leftEyeProb, rightEyeProb)
         }
     }
 

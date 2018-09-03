@@ -1,6 +1,5 @@
 package com.fhc.emotionrec.facedetect.detector.facetracker
 
-import android.app.Application
 import android.graphics.Color
 import com.fhc.emotionrec.facedetect.db.dao.FaceImageDao
 import com.fhc.emotionrec.facedetect.models.FvFaceImage
@@ -8,8 +7,7 @@ import com.fhc.emotionrec.facedetect.models.toFaceImageEntity
 import kotlinx.coroutines.experimental.launch
 import java.util.*
 
-class FaceTrackerDatabaseController(private val appContext: Application,
-                                    private val faceImageDao: FaceImageDao) : FirebaseVisionFaceTracker.Listener {
+class FaceTrackerDatabaseController(private val faceImageDao: FaceImageDao) : FirebaseVisionFaceTracker.Listener {
 
     private var stopUpdates = false
     private val COLOR_CHOICES = intArrayOf(
@@ -56,11 +54,5 @@ class FaceTrackerDatabaseController(private val appContext: Application,
         }
     }
 
-
-    /**
-     * Returns a random element.
-     */
-    fun <T> List<T>.random(): T? = if (size > 0) get(Random().nextInt(size)) else null
-
-
+    private fun <T> List<T>.random(): T? = if (size > 0) get(Random().nextInt(size)) else null
 }
