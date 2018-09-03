@@ -32,10 +32,6 @@ class CameraDetectionActivity : AppCompatActivity(), FaceDetailItemAdapter.Liste
     private var mlKitFaceDetector: FirebaseVisionFaceDetector? = null
     private var detector: FirebaseVisionDetectorWrapper? = null
     private var cameraSource: CameraSource? = null
-    private var launchingDetail = false
-    private var launchedDetail = false
-
-//    private var faceTrackerAdapterController: FaceDetailItemFaceTrackerListener? = null
 
     private var faceDetailItemAdapter: FaceDetailItemAdapter? = null
 
@@ -85,70 +81,25 @@ class CameraDetectionActivity : AppCompatActivity(), FaceDetailItemAdapter.Liste
     }
 
     override fun onFaceDetailItemClicked(faceDetailItem: FaceDetailItem) {
-
         launch(UI) {
-            //            Log.d("test", "launch ui")
-//            camera_progress.visibility = View.GONE
-//            Log.d("test", "start activity")
             startActivity(FaceDetailActivity.newIntent(this@CameraDetectionActivity, faceDetailItem.uuid.toString()))
-//            launchingDetail = false
-//            launchedDetail = true
         }
     }
-//
-//    override fun onFaceDetailClicked(uuid: UUID, faceDetailItems: List<FaceDetailItem>) {
-//        Log.d("test", "stop it")
-//        preview_surface_view.stop()
-//        launchingDetail = true
-//        camera_progress.visibility = View.VISIBLE
-//        async {
-//            Log.d("test", "about to parcel")
-//            val faceIdParcel = TrackedFaceImageParcel.create(
-//                    uuid,
-//                    ColorFaceTrackerListener.getColor(uuid),
-//                    faceDetailItems,
-//                    contentResolver
-//            )
-//            Log.d("test", "after parcel")
-//            launch(UI) {
-//                Log.d("test", "launch ui")
-//                camera_progress.visibility = View.GONE
-//                Log.d("test", "start activity")
-//                startActivity(
-//                        FaceDetailActivity.newIntent(
-//                                this@CameraDetectionActivity,
-//                                faceIdParcel
-//                        )
-//                )
-//                launchingDetail = false
-//                launchedDetail = true
-//            }
-//
-//        }
-//    }
 
     override fun onResume() {
         super.onResume()
-        if (!launchingDetail) {
+        if (detector?.isOperational == true && cameraSource != null) {
+            preview_surface_view.start(cameraSource!!)
+        } else {
+            detector = FirebaseVisionDetectorWrapper(mlKitFaceDetector!!)
+            detector?.setProcessor(faceTrackerProcessor)
 
-            if (launchedDetail) {
-//                faceTrackerAdapterController?.clearAndResumeUpdates()
-                launchedDetail = false
-            }
-
-            if (detector?.isOperational == true && cameraSource != null) {
-                preview_surface_view.start(cameraSource!!)
-            } else {
-                detector = FirebaseVisionDetectorWrapper(mlKitFaceDetector!!)
-                detector?.setProcessor(faceTrackerProcessor)
-
-                cameraSource = CameraSource.Builder(this, detector)
-                        .setRequestedPreviewSize(640, 480)
-                        .setFacing(CameraSource.CAMERA_FACING_BACK)
-                        .setRequestedFps(10.0f)
-                        .build()
-                preview_surface_view.start(cameraSource!!)
-            }
+            cameraSource = CameraSource.Builder(this, detector)
+                    .setRequestedPreviewSize(640, 480)
+                    .setFacing(CameraSource.CAMERA_FACING_BACK)
+                    .setRequestedFps(10.0f)
+                    .build()
+            preview_surface_view.start(cameraSource!!)
         }
     }
 
@@ -164,9 +115,7 @@ class CameraDetectionActivity : AppCompatActivity(), FaceDetailItemAdapter.Liste
 }
 
 class DetectorFaceTracker(private val faceTrackerListener: FirebaseVisionFaceTracker.Listener) : MultiProcessor.Factory<FvFaceImage> {
-
     override fun create(faceImage: FvFaceImage?): Tracker<FvFaceImage> {
-
         return FirebaseVisionFaceTracker(faceTrackerListener)
     }
 }
