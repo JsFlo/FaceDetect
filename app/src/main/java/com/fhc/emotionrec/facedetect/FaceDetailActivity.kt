@@ -9,15 +9,14 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.support.v7.app.AppCompatActivity
 import com.fhc.emotionrec.facedetect.models.FvFaceImage
-import com.fhc.emotionrec.facedetect.models.TrackedFaceImageParcel
 
 class FaceDetailActivity : AppCompatActivity() {
 
     companion object {
-        fun newIntent(context: Context, faceIdParcel: TrackedFaceImageParcel): Intent {
+        fun newIntent(context: Context, uuid: String): Intent {
 
             val intent = Intent(context, FaceDetailActivity::class.java)
-            intent.putExtra("faceIdParcel", faceIdParcel)
+            intent.putExtra("faceIdParcel", uuid)
             return intent
         }
     }
@@ -26,12 +25,12 @@ class FaceDetailActivity : AppCompatActivity() {
         return MediaStore.Images.Media.getBitmap(contentResolver, this)
     }
 
-    private var faceIdParcel: TrackedFaceImageParcel? = null
+//    private var faceIdParcel: TrackedFaceImageParcel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_face_detail)
-        faceIdParcel = intent.getParcelableExtra("faceIdParcel") as TrackedFaceImageParcel
+//        faceIdParcel = intent.getParcelableExtra("faceIdParcel") as TrackedFaceImageParcel
 //        async {
 //            val faceImages = faceIdParcel?.faceImages?.map { FvFaceImage(it.smilingProb, it.leftEyeProb, it.rightEyeProb, it.imageBitmapUri.getBitmap(contentResolver), it.boundingBox, it.imageBitmapUri) }
 //            faceImages?.let { faceImages ->

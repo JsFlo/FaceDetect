@@ -2,7 +2,7 @@ package com.fhc.emotionrec.facedetect.ui.faceoverlay
 
 import android.graphics.Canvas
 import android.graphics.Paint
-import com.fhc.emotionrec.facedetect.db.entity.FaceImageEntity
+import com.fhc.emotionrec.facedetect.models.FaceImageEntity
 
 
 abstract class BaseFaceOverlay(@Volatile var face: FaceImageEntity) : Overlay() {

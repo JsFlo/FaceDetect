@@ -13,6 +13,7 @@ import androidx.core.net.toUri
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
 
@@ -80,4 +81,19 @@ private fun Bitmap.rotateImage(angle: Float): Bitmap {
     val matrix = Matrix()
     matrix.postRotate(angle)
     return Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
+}
+
+fun Bitmap.toFilePath(): String {
+    val file_path = Environment.getExternalStorageDirectory().absolutePath + "/faceimages"
+    val dir = File(file_path)
+    if (!dir.exists())
+        dir.mkdirs()
+
+    val file = File(dir, "faceimages" + System.currentTimeMillis() + ".png")
+    val fOut = FileOutputStream(file)
+
+    this.compress(Bitmap.CompressFormat.PNG, 100, fOut)
+    fOut.flush()
+    fOut.close()
+    return file.absoluteFile.toString()
 }

@@ -3,8 +3,8 @@ package com.fhc.emotionrec.facedetect.detector.facetracker
 import android.app.Application
 import android.graphics.Color
 import com.fhc.emotionrec.facedetect.db.dao.FaceImageDao
-import com.fhc.emotionrec.facedetect.db.entity.toFaceImageEntity
 import com.fhc.emotionrec.facedetect.models.FvFaceImage
+import com.fhc.emotionrec.facedetect.models.toFaceImageEntity
 import kotlinx.coroutines.experimental.launch
 import java.util.*
 

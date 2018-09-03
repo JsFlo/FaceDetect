@@ -8,7 +8,7 @@ import android.content.Context
 import com.fhc.emotionrec.facedetect.db.adapters.RectAdapter
 import com.fhc.emotionrec.facedetect.db.adapters.UuidAdapter
 import com.fhc.emotionrec.facedetect.db.dao.FaceImageDao
-import com.fhc.emotionrec.facedetect.db.entity.FaceImageEntity
+import com.fhc.emotionrec.facedetect.models.FaceImageEntity
 
 
 @Database(entities = arrayOf(FaceImageEntity::class), version = 1)

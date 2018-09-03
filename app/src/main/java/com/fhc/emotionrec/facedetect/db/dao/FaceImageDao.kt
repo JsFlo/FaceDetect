@@ -2,7 +2,7 @@ package com.fhc.emotionrec.facedetect.db.dao
 
 import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.*
-import com.fhc.emotionrec.facedetect.db.entity.FaceImageEntity
+import com.fhc.emotionrec.facedetect.models.FaceImageEntity
 import java.util.*
 
 

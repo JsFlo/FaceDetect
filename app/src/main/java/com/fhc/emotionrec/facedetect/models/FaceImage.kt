@@ -1,15 +1,15 @@
-package com.fhc.emotionrec.facedetect.db.entity
+package com.fhc.emotionrec.facedetect.models
 
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
-import android.graphics.Bitmap
 import android.graphics.Rect
-import android.net.Uri
-import android.os.Environment
-import com.fhc.emotionrec.facedetect.models.FvFaceImage
-import java.io.File
-import java.io.FileOutputStream
+import com.emotionrec.emotionrecapp.utils.toFilePath
+import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import java.util.*
+
+
+data class FvFaceImage(val fvFace: FirebaseVisionFace, val fvImage: FirebaseVisionImage)
 
 
 @Entity
@@ -39,19 +39,4 @@ fun FvFaceImage.toFaceImageEntity(uuid: UUID): FaceImageEntity {
             fvFace.rightEyeOpenProbability,
             fvFace.boundingBox,
             fvImage.bitmapForDebugging.toFilePath())
-}
-
-private fun Bitmap.toFilePath(): String {
-    val file_path = Environment.getExternalStorageDirectory().absolutePath + "/faceimages"
-    val dir = File(file_path)
-    if (!dir.exists())
-        dir.mkdirs()
-
-    val file = File(dir, "faceimages" + System.currentTimeMillis() + ".png")
-    val fOut = FileOutputStream(file)
-
-    this.compress(Bitmap.CompressFormat.PNG, 100, fOut)
-    fOut.flush()
-    fOut.close()
-    return file.absoluteFile.toString()
 }
