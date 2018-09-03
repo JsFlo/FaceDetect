@@ -2,17 +2,17 @@ package com.fhc.emotionrec.facedetect.ui.faceoverlay
 
 import android.graphics.Canvas
 import android.graphics.Paint
-import com.fhc.emotionrec.facedetect.models.FvFaceImage
+import com.fhc.emotionrec.facedetect.db.entity.FaceImageEntity
 
 
-abstract class BaseFaceOverlay(@Volatile var face: FvFaceImage) : Overlay() {
+abstract class BaseFaceOverlay(@Volatile var face: FaceImageEntity) : Overlay() {
 
     private var overlayTransformations: OverlayTransformations? = null
     override fun onCreate(overlayTransformations: OverlayTransformations) {
         this.overlayTransformations = overlayTransformations
     }
 
-    fun updateFace(newFace: FvFaceImage) {
+    fun updateFace(newFace: FaceImageEntity) {
         face = newFace
         overlayTransformations?.postInvalidate()
     }
@@ -21,23 +21,23 @@ abstract class BaseFaceOverlay(@Volatile var face: FvFaceImage) : Overlay() {
         overlayTransformations?.let { onDraw(canvas, face, it) }
     }
 
-    abstract fun onDraw(canvas: Canvas, face: FvFaceImage, overlayTransformations: OverlayTransformations)
+    abstract fun onDraw(canvas: Canvas, face: FaceImageEntity, overlayTransformations: OverlayTransformations)
 
     override fun destroy() {
         overlayTransformations = null
     }
 }
 
-class GraphicFaceOverlay(faceImage: FvFaceImage, selectedColor: Int) : BaseFaceOverlay(faceImage) {
+class GraphicFaceOverlay(faceImage: FaceImageEntity) : BaseFaceOverlay(faceImage) {
 
     private val facePositionPaint = Paint()
     private val boxPaint = Paint()
     private var cleared = false
 
     init {
-        facePositionPaint.color = selectedColor
+        facePositionPaint.color = faceImage.color
 
-        boxPaint.color = selectedColor
+        boxPaint.color = faceImage.color
         boxPaint.style = Paint.Style.STROKE
         boxPaint.strokeWidth =
                 BOX_STROKE_WIDTH
@@ -46,12 +46,12 @@ class GraphicFaceOverlay(faceImage: FvFaceImage, selectedColor: Int) : BaseFaceO
     private var translatedCenterX: Float = 0f
     private var translatedCenterY: Float = 0f
 
-    override fun onDraw(canvas: Canvas, faceImage: FvFaceImage, overlayTransformations: OverlayTransformations) {
+    override fun onDraw(canvas: Canvas, faceImage: FaceImageEntity, overlayTransformations: OverlayTransformations) {
         if (!cleared) {
             with(overlayTransformations) {
 
-                val centerX = faceImage.fvFace.boundingBox.exactCenterX()
-                val centerY = faceImage.fvFace.boundingBox.exactCenterY()
+                val centerX = faceImage.boundingBox.exactCenterX()
+                val centerY = faceImage.boundingBox.exactCenterY()
 
                 translatedCenterX = translateX(centerX)
                 translatedCenterY = translateY(centerY)
@@ -60,7 +60,7 @@ class GraphicFaceOverlay(faceImage: FvFaceImage, selectedColor: Int) : BaseFaceO
                         FACE_POSITION_RADIUS, facePositionPaint)
 
                 canvas.drawCircle(translatedCenterX, translatedCenterY,
-                        translatedCenterX - translateX(faceImage.fvFace.boundingBox.left.toFloat()),
+                        translatedCenterX - translateX(faceImage.boundingBox.left.toFloat()),
                         boxPaint)
 //                cleared = false
 

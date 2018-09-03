@@ -51,10 +51,12 @@ class OverlayGroupView(context: Context, attrs: AttributeSet?) : View(context, a
         clear()
     }
 
-    fun addOverlay(overlay: Overlay) {
+    fun addOverlays(vararg newOverlays: Overlay) {
         syncAndInvalidate {
-            overlay.onCreate(this)
-            overlays.add(overlay)
+            newOverlays.forEach {
+                it.onCreate(this)
+                overlays.add(it)
+            }
         }
     }
 
