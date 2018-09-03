@@ -52,7 +52,7 @@ class FaceTrackerDatabaseController(private val appContext: Application,
 
     private fun deleteFaceImageFromDb(uuid: UUID) {
         launch {
-            faceImageDao.deleteFaceImage(uuid)
+            faceImageDao.deActivateFaceImage(uuid)
         }
     }
 

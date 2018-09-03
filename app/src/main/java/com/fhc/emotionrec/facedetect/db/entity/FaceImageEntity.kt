@@ -12,19 +12,19 @@ import java.io.FileOutputStream
 import java.util.*
 
 
-
 @Entity
 data class FaceImageEntity(@PrimaryKey val uuid: UUID,
-                      val color: Int,
-                      val smilingProb: Float,
-                      val leftEyeProb: Float,
-                      val rightEyeProb: Float,
-                      val boundingBox: Rect,
-                      val imagePath: String)
+                           val color: Int,
+                           val smilingProb: Float,
+                           val leftEyeProb: Float,
+                           val rightEyeProb: Float,
+                           val boundingBox: Rect,
+                           val imagePath: String,
+                           val active: Boolean = true)
 
 
 fun FvFaceImage.toFaceImageEntity(uuid: UUID, color: Int): FaceImageEntity {
-    return FaceImageEntity(uuid,color,
+    return FaceImageEntity(uuid, color,
             fvFace.smilingProbability,
             fvFace.leftEyeOpenProbability,
             fvFace.rightEyeOpenProbability,
@@ -33,7 +33,7 @@ fun FvFaceImage.toFaceImageEntity(uuid: UUID, color: Int): FaceImageEntity {
 }
 
 fun FvFaceImage.toFaceImageEntity(uuid: UUID): FaceImageEntity {
-    return FaceImageEntity(uuid,0,
+    return FaceImageEntity(uuid, 0,
             fvFace.smilingProbability,
             fvFace.leftEyeOpenProbability,
             fvFace.rightEyeOpenProbability,

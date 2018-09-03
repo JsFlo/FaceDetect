@@ -16,7 +16,7 @@ interface FaceImageDao {
     fun update(updatedFaceImageEntity: FaceImageEntity){
         val oldFaceImageEntity = getFaceImageEntityWithUuid(updatedFaceImageEntity.uuid)
         if(oldFaceImageEntity != null) {
-            insert(updatedFaceImageEntity.copy(color = oldFaceImageEntity.color))
+            insert(updatedFaceImageEntity.copy(color = oldFaceImageEntity.color, active = oldFaceImageEntity.active))
         } else {
             insert(updatedFaceImageEntity)
         }
@@ -28,9 +28,9 @@ interface FaceImageDao {
     @Query("SELECT * FROM FaceImageEntity WHERE FaceImageEntity.uuid = :uuid")
     fun getFaceImageEntityWithUuid(uuid: UUID): FaceImageEntity?
 
-    @Query("DELETE FROM FaceImageEntity WHERE FaceImageEntity.uuid = :uuid")
-    fun deleteFaceImage(uuid: UUID)
+    @Query("UPDATE FaceImageEntity SET active = 0 WHERE FaceImageEntity.uuid = :uuid")
+    fun deActivateFaceImage(uuid: UUID)
 
-    @Query("SELECT * FROM faceimageentity")
+    @Query("SELECT * FROM faceimageentity WHERE active = 1")
     fun getAllFaceImages(): LiveData<List<FaceImageEntity>>
 }

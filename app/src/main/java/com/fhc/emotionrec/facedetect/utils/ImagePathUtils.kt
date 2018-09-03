@@ -10,6 +10,8 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.widget.ImageView
 import androidx.core.net.toUri
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -30,39 +32,48 @@ fun imageToUri(contentResolver: ContentResolver, bitmap: Bitmap): Uri {
     return file.toUri()
 }
 
-fun ImageView.setImage(imagePath: String): Bitmap {
-    val targetW = width
-    val targetH = height
+fun ImageView.setImage(imagePath: String){
+    launch {
 
-    // Get the dimensions of the bitmap
-    val bmOptions = BitmapFactory.Options()
-    with(bmOptions) {
-        inJustDecodeBounds = true
-        val photoW = outWidth
-        val photoH = outHeight
-        val scaleFactor = Math.min(photoW / targetW, photoH / targetH)
-        inJustDecodeBounds = false
-        inSampleSize = scaleFactor
-        inPurgeable = true
-    }
-    val bitmap = BitmapFactory.decodeFile(imagePath, bmOptions)
-    var rotatedBitmap = bitmap
 
-    // rotate bitmap if needed
-    try {
-        val ei = ExifInterface(imagePath)
-        val orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
-        when (orientation) {
-            ExifInterface.ORIENTATION_ROTATE_90 -> rotatedBitmap = bitmap.rotateImage(90f)
-            ExifInterface.ORIENTATION_ROTATE_180 -> rotatedBitmap = bitmap.rotateImage(180f)
-            ExifInterface.ORIENTATION_ROTATE_270 -> rotatedBitmap = bitmap.rotateImage(270f)
+        val targetW = width
+        val targetH = height
+        if(targetW > 0 && targetH > 0) {
+
+
+            // Get the dimensions of the bitmap
+            val bmOptions = BitmapFactory.Options()
+            with(bmOptions) {
+                inJustDecodeBounds = true
+                val photoW = outWidth
+                val photoH = outHeight
+                val scaleFactor = Math.min(photoW / targetW, photoH / targetH)
+                inJustDecodeBounds = false
+                inSampleSize = scaleFactor
+                inPurgeable = true
+            }
+            val bitmap = BitmapFactory.decodeFile(imagePath, bmOptions)
+            var rotatedBitmap = bitmap
+
+            // rotate bitmap if needed
+            try {
+                val ei = ExifInterface(imagePath)
+                val orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
+                when (orientation) {
+                    ExifInterface.ORIENTATION_ROTATE_90 -> rotatedBitmap = bitmap.rotateImage(90f)
+                    ExifInterface.ORIENTATION_ROTATE_180 -> rotatedBitmap = bitmap.rotateImage(180f)
+                    ExifInterface.ORIENTATION_ROTATE_270 -> rotatedBitmap = bitmap.rotateImage(270f)
+                }
+            } catch (e: IOException) {
+                throw IllegalStateException("Error: Image processing")
+            }
+
+            launch(UI) {
+                setImageBitmap(rotatedBitmap)
+            }
         }
-    } catch (e: IOException) {
-        throw IllegalStateException("Error: Image processing")
-    }
 
-    setImageBitmap(rotatedBitmap)
-    return rotatedBitmap
+    }
 }
 
 private fun Bitmap.rotateImage(angle: Float): Bitmap {

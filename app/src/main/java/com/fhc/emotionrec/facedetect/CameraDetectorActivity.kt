@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
+import android.view.View
+import com.fhc.emotionrec.facedetect.adapter.FaceDetailItem
 import com.fhc.emotionrec.facedetect.adapter.FaceDetailItemAdapter
 import com.fhc.emotionrec.facedetect.db.FaceImageDb
 import com.fhc.emotionrec.facedetect.db.entity.FaceImageEntity
@@ -12,6 +15,7 @@ import com.fhc.emotionrec.facedetect.detector.FirebaseVisionDetectorWrapper
 import com.fhc.emotionrec.facedetect.detector.facetracker.FaceTrackerDatabaseController
 import com.fhc.emotionrec.facedetect.detector.facetracker.FirebaseVisionFaceTracker
 import com.fhc.emotionrec.facedetect.models.FvFaceImage
+import com.fhc.emotionrec.facedetect.ui.FaceDetailStats
 import com.fhc.emotionrec.facedetect.ui.faceoverlay.GraphicFaceOverlay
 import com.fhc.emotionrec.facedetect.ui.faceoverlay.OverlayGroupView
 import com.google.android.gms.vision.CameraSource
@@ -21,8 +25,11 @@ import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import kotlinx.android.synthetic.main.activity_emotion_detection.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
+import java.util.*
 
-class EmotionDetectionActivity : AppCompatActivity() {
+class CameraDetectionActivity : AppCompatActivity(), FaceDetailItemAdapter.Listener {
 
     private var faceTrackerProcessor: MultiProcessor<FvFaceImage>? = null
     private var mlKitFaceDetector: FirebaseVisionFaceDetector? = null
@@ -33,6 +40,8 @@ class EmotionDetectionActivity : AppCompatActivity() {
 
 //    private var faceTrackerAdapterController: FaceDetailItemFaceTrackerListener? = null
 
+    private var faceDetailItemAdapter: FaceDetailItemAdapter? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_emotion_detection)
@@ -41,9 +50,10 @@ class EmotionDetectionActivity : AppCompatActivity() {
 
         // setup recycler view
         with(face_id_recycler_view) {
-            layoutManager = LinearLayoutManager(this@EmotionDetectionActivity, RecyclerView.HORIZONTAL, false)
-            val faceDetailItemAdapter = FaceDetailItemAdapter()
+            layoutManager = LinearLayoutManager(this@CameraDetectionActivity, RecyclerView.HORIZONTAL, false)
+            faceDetailItemAdapter = FaceDetailItemAdapter()
             adapter = faceDetailItemAdapter
+            faceDetailItemAdapter?.listener = this@CameraDetectionActivity
         }
 
         // get an instance of the new face detector
@@ -53,7 +63,6 @@ class EmotionDetectionActivity : AppCompatActivity() {
                 .build()
         mlKitFaceDetector = FirebaseVision.getInstance().getVisionFaceDetector(options)
 
-//        faceTrackerAdapterController =FaceDetailItemFaceTrackerListener(this, adapter, this)
         // face tracker that adds to db
         faceTrackerProcessor = MultiProcessor.Builder<FvFaceImage>(DetectorFaceTracker(FaceTrackerDatabaseController(application,
                 faceImageDao)))
@@ -69,12 +78,25 @@ class EmotionDetectionActivity : AppCompatActivity() {
     private fun onNewFaceImages(faceImages: List<FaceImageEntity>?, overlayGroupView: OverlayGroupView) {
 
         // image adapter
-
+        val faceDetailItems = faceImages?.map { it.toFaceDetailItem() }
+        faceDetailItemAdapter?.swapFaceDetailItems(faceDetailItems)
 
         // graphic overlays
         overlayGroupView.clear()
         val graphiFaceOverlays = faceImages?.map { GraphicFaceOverlay(it) } ?: mutableListOf()
-        overlayGroupView.addOverlays(*graphiFaceOverlays.toTypedArray())
+        overlayGroupView.addOverlays(graphiFaceOverlays)
+    }
+
+    override fun onFaceDetailItemClicked(faceDetailItem: FaceDetailItem) {
+
+        launch(UI) {
+            //            Log.d("test", "launch ui")
+//            camera_progress.visibility = View.GONE
+//            Log.d("test", "start activity")
+            startActivity(FaceDetailActivity.newIntent(this@CameraDetectionActivity, faceDetailItem.uuid.toString()))
+//            launchingDetail = false
+//            launchedDetail = true
+        }
     }
 //
 //    override fun onFaceDetailClicked(uuid: UUID, faceDetailItems: List<FaceDetailItem>) {
@@ -97,7 +119,7 @@ class EmotionDetectionActivity : AppCompatActivity() {
 //                Log.d("test", "start activity")
 //                startActivity(
 //                        FaceDetailActivity.newIntent(
-//                                this@EmotionDetectionActivity,
+//                                this@CameraDetectionActivity,
 //                                faceIdParcel
 //                        )
 //                )
@@ -150,4 +172,9 @@ class DetectorFaceTracker(private val faceTrackerListener: FirebaseVisionFaceTra
 
         return FirebaseVisionFaceTracker(faceTrackerListener)
     }
+}
+
+private fun FaceImageEntity.toFaceDetailItem(): FaceDetailItem {
+    return FaceDetailItem(uuid, color, imagePath, boundingBox,
+            FaceDetailStats(smilingProb, leftEyeProb, rightEyeProb))
 }
