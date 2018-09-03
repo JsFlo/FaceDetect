@@ -23,17 +23,8 @@ data class FaceImageEntity(@PrimaryKey val uuid: UUID,
                            val active: Boolean = true)
 
 
-fun FvFaceImage.toFaceImageEntity(uuid: UUID, color: Int): FaceImageEntity {
+fun FvFaceImage.toFaceImageEntity(uuid: UUID, color: Int=0): FaceImageEntity {
     return FaceImageEntity(uuid, color,
-            fvFace.smilingProbability,
-            fvFace.leftEyeOpenProbability,
-            fvFace.rightEyeOpenProbability,
-            fvFace.boundingBox,
-            fvImage.bitmapForDebugging.toFilePath())
-}
-
-fun FvFaceImage.toFaceImageEntity(uuid: UUID): FaceImageEntity {
-    return FaceImageEntity(uuid, 0,
             fvFace.smilingProbability,
             fvFace.leftEyeOpenProbability,
             fvFace.rightEyeOpenProbability,
